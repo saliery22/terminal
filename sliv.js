@@ -37,14 +37,11 @@ this.style.background = "#b2f5b4";
 
 
 
-// execute when DOM ready
+
 $(document).ready(function () {
-  // init session
-  var TOKEN = '0999946a10477f4854a9e6f27fcbe8424E7222985DA6B8C3366AABB4B94147D6C5BAE69F';
   wialon.core.Session.getInstance().initSession("https://local3.ingps.com.ua");
-  wialon.core.Session.getInstance().loginToken(TOKEN, "", // try to login
-    function (code) { // login callback
-      // if error code - print error message
+  wialon.core.Session.getInstance().loginToken('0999946a10477f4854a9e6f27fcbe84254859095D46A41A09CEBC38700F19ADB105CAB95', "", // try to login
+    function (code) { 
       if (code){ msg(wialon.core.Errors.getErrorText(code)); return; }
       msg('Зеднання з ККЗ успішно');
     }
