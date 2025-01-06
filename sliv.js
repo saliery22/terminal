@@ -83,7 +83,7 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
   function setResult(label, result) {
     label.textContent = result.data;
     camQrSave.textContent= result.data;
-    if($('#start-button').is(':hidden')==false){
+    if($('#start-button').is(':hidden')){
       $("#start-button").show();
       clearTimeout(timerId);
     }
