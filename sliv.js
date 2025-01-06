@@ -101,7 +101,6 @@ document.getElementById('start-button').addEventListener('click', () => {
 });
 
 
-msg(111111111111111)
 
 
 
