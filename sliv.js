@@ -67,34 +67,66 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
 
 
 
-    msg('сканер завантажено')
+
+ 
+
+
+
   const video = document.getElementById('qr-video');
-  const videoContainer = document.getElementById('video-container');
   const camQrResult = document.getElementById('cam-qr-result');
-  const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+  const camQrSave= document.getElementById('cam-qr-result-save');
+
+
+  let timerId =setTimeout(hide_bt, 5000);
+
 
   function setResult(label, result) {
-    console.log(result.data);
     label.textContent = result.data;
-    camQrResultTimestamp.textContent = new Date().toString();
+    camQrSave.textContent= result.data;
+    if($('#start-button').is(':hidden')==false){
+      $("#start-button").show();
+      clearTimeout(timerId);
+    }
+
 }
 
   const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
     onDecodeError: error => {
         camQrResult.textContent = error;
+        if($('#start-button').is(':hidden')==false) timerId =setTimeout(hide_bt, 5000);
     },
     highlightScanRegion: true,
     highlightCodeOutline: true,
 });
 
-document.getElementById('start-button').addEventListener('click', () => {
-  
-    scanner.start();
-    msg(scanner)
+scanner.start();
 
+
+$("#start-button").hide();
+document.getElementById('start-button').addEventListener('click', () => {
+  let d = Date.now();
+  let n = 'QR-код';
+  let t = camQrSave.textContent;
+  let bufer ='||'+d+'|'+n+'|'+t+'|Термінал1|'+d+'';
+  let remotee= wialon.core.Remote.getInstance(); 
+  remotee.remoteCall('file/write',{'itemId':20233,'storageType':1,'path':'//jurnal.txt',"content":bufer,"writeType":1,'contentType':0},function (error,data) {
+    if (error) {msg(wialon.core.Errors.getErrorText(error));
+    }else{
+      $("#start-button").hide();
+      msg('відправлено в журнал');
+    }
+    });
+  
+   
  
 });
 
+
+
+function hide_bt() {
+  $("#start-button").hide();
+  camQrSave.textContent= '';
+}
 
 
 
