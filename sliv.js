@@ -68,7 +68,7 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
 
 
 
-  import('../qr-scanner.min.js').then((module) => {
+  import('qr-scanner.min.js').then((module) => {
     const QrScanner = module.default;
     // do something with QrScanner
       msg('сканер завантажено')
