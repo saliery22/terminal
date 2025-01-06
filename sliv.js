@@ -37,9 +37,9 @@ this.style.background = "#b2f5b4";
 
 
 
-
+// execute when DOM ready
 $(document).ready(function () {
-eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('2.1.5.4().i("h://g.f.e.d");2.1.5.4().c(\'b\',"",a(0){9(0){3(2.1.8.7(0));6}3(\'Зеднання з ККЗ успішно\')});',19,19,'code|core|wialon|msg|getInstance|Session|return|getErrorText|Errors|if|function|0999946a10477f4854a9e6f27fcbe842A247D1374A465F550351447C6D99FB325422B89D|loginToken|ua|com|ingps|local3|https|initSession'.split('|'),0,{}))
+eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('2.1.5.4().i("h://g.f.e.d");2.1.5.4().c(\'b\',"",a(0){9(0){3(2.1.8.7(0));6}3(\'Зеднання з ККЗ успішно\')});',19,19,'code|core|wialon|msg|getInstance|Session|return|getErrorText|Errors|if|function|0999946a10477f4854a9e6f27fcbe842A247D1374A465F550351447C6D99FB325422B89D|loginToken|ua|com|ingps|local3|https|initSession'.split('|'),0,{}));
   unit=fn_load('unit');
   if(unit){
     $("#obekt :contains('"+unit+"')").attr("selected", "selected");
@@ -96,3 +96,30 @@ setInterval(function() {
     sec=60;
   }
   }, 1000);
+
+
+
+
+
+  const video = document.getElementById('qr-video');
+  const videoContainer = document.getElementById('video-container');
+  const camQrResult = document.getElementById('cam-qr-result');
+  const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+
+  function setResult(label, result) {
+    console.log(result.data);
+    label.textContent = result.data;
+    camQrResultTimestamp.textContent = new Date().toString();
+}
+
+  const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
+    onDecodeError: error => {
+        camQrResult.textContent = error;
+    },
+    highlightScanRegion: true,
+    highlightCodeOutline: true,
+});
+
+document.getElementById('start-button').addEventListener('click', () => {
+  scanner.start();
+});
