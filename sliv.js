@@ -55,6 +55,68 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
   bufer=fn_load('bufer');
   if(!bufer)bufer='';
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  import('../qr-scanner.min.js').then((module) => {
+    const QrScanner = module.default;
+    // do something with QrScanner
+    
+  const video = document.getElementById('qr-video');
+  const videoContainer = document.getElementById('video-container');
+  const camQrResult = document.getElementById('cam-qr-result');
+  const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+
+  function setResult(label, result) {
+    console.log(result.data);
+    label.textContent = result.data;
+    camQrResultTimestamp.textContent = new Date().toString();
+}
+
+  const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
+    onDecodeError: error => {
+        camQrResult.textContent = error;
+    },
+    highlightScanRegion: true,
+    highlightCodeOutline: true,
+});
+
+document.getElementById('start-button').addEventListener('click', () => {
+  
+    scanner.start();
+    msg(scanner)
+
+ 
+});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   });
 
 
@@ -99,31 +161,3 @@ setInterval(function() {
 
 
 
-
-  import('../qr-scanner.min.js').then((module) => {
-    const QrScanner = module.default;
-    // do something with QrScanner
-
-  const video = document.getElementById('qr-video');
-  const videoContainer = document.getElementById('video-container');
-  const camQrResult = document.getElementById('cam-qr-result');
-  const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-
-  function setResult(label, result) {
-    console.log(result.data);
-    label.textContent = result.data;
-    camQrResultTimestamp.textContent = new Date().toString();
-}
-
-  const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
-    onDecodeError: error => {
-        camQrResult.textContent = error;
-    },
-    highlightScanRegion: true,
-    highlightCodeOutline: true,
-});
-
-document.getElementById('start-button').addEventListener('click', () => {
-  scanner.start();
-});
-});
