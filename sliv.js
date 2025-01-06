@@ -71,7 +71,7 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
   import('../qr-scanner.min.js').then((module) => {
     const QrScanner = module.default;
     // do something with QrScanner
-    
+      msg('сканер завантажено')
   const video = document.getElementById('qr-video');
   const videoContainer = document.getElementById('video-container');
   const camQrResult = document.getElementById('cam-qr-result');
