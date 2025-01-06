@@ -100,6 +100,9 @@ setInterval(function() {
 
 
 
+  import('../qr-scanner.min.js').then((module) => {
+    const QrScanner = module.default;
+    // do something with QrScanner
 
   const video = document.getElementById('qr-video');
   const videoContainer = document.getElementById('video-container');
@@ -122,4 +125,5 @@ setInterval(function() {
 
 document.getElementById('start-button').addEventListener('click', () => {
   scanner.start();
+});
 });
