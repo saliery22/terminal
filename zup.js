@@ -235,7 +235,7 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
           let pop = unitMarker.getPopup();
-          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t));
+          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t));
         } else {
           // create new marker
           unitMarker = getUnitMarker(unit);
