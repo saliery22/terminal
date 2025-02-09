@@ -639,7 +639,7 @@ function clear(){
  recognizer.interimResults = true;
 
  // Какой язык будем распознавать?
- recognizer.lang = 'ua-UA';
+ recognizer.lang = 'uk-UA';
 
  // Используем колбек для обработки результатов
  recognizer.onresult = function (event) {
