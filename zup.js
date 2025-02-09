@@ -640,13 +640,13 @@ function clear(){
  recognizer.interimResults = true;
 
  // Какой язык будем распознавать?
- recognizer.lang = 'uk';
+ recognizer.lang = "uk-UA";
 
  // Используем колбек для обработки результатов
  recognizer.onresult = function (event) {
    var result = event.results[event.resultIndex];
    if (result.isFinal) {
-    let res0 = result[0].transcript.replace(/[^А-я0-9]/g, '');
+    let res0 = result[0].transcript.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9]/g, '');
     let res = res0.charAt(0).toUpperCase() + res0.slice(1)
     $("#lis0").val(res);
     for (let i = 0; i<unitslist.length; i++){
