@@ -315,6 +315,7 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
 //}
 
 
+
 function show_track (time1,time2) {
 
 	var unit_id =  chus_unit_id,
@@ -639,13 +640,15 @@ function clear(){
  recognizer.interimResults = true;
 
  // Какой язык будем распознавать?
- recognizer.lang = 'uk-UA';
+ recognizer.lang = 'uk';
 
  // Используем колбек для обработки результатов
  recognizer.onresult = function (event) {
    var result = event.results[event.resultIndex];
    if (result.isFinal) {
-    let res = result[0].transcript.replace(/\W|_/g, '');
+    let res0 = result[0].transcript.replace(/[^А-я0-9]/g, '');
+    let res = res0.charAt(0).toUpperCase() + res0.slice(1)
+    $("#lis0").val(res);
     for (let i = 0; i<unitslist.length; i++){
       let nm=unitslist[i].getName();
       let id=unitslist[i].getId();
@@ -661,11 +664,9 @@ function clear(){
         break;
      }
      }
-    $("#lis0").val(res);
+
    
-   } else {
-     console.log('Промежуточный результат: ', result[0].transcript);
-   }
+   } 
  };
 
  function speech () {
