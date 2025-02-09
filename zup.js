@@ -45,7 +45,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 22;
+  var imsaze = 50;
   if (!unitPos) return null;
     
 
@@ -234,6 +234,8 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
       if (pos) {
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
+          let pop = unitMarker.getPopup();
+          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t));
         } else {
           // create new marker
           unitMarker = getUnitMarker(unit);
@@ -655,7 +657,7 @@ function clear(){
      if(nm.indexOf(res)>=0){
       let y=unitslist[i].getPosition().y;
       let x=unitslist[i].getPosition().x;
-      map.setView([y,x],10,{animate: false});
+      map.setView([y,x]);
       $("#lis0").val(nm);
       chus_unit_id = id;
       markerByUnit[id].openPopup();
