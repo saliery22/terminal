@@ -1,5 +1,4 @@
 
-var TOKEN = '0999946a10477f4854a9e6f27fcbe8424E7222985DA6B8C3366AABB4B94147D6C5BAE69F';
 
 // global variables
 var map, marker,unitslist = [],allunits = [],rest_units = [],marshruts = [],zup = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},marshrutMarkers = [],unitsID = {},Vibranaya_zona;
@@ -72,6 +71,7 @@ function getUnitMarker(unit) {
      var unitId = unit.getId();
      $("#lis0").val(unit.getName());
      chus_unit_id = unitId;
+     layers[0]=0;
      show_track();
 
   });
@@ -223,14 +223,27 @@ function initUIData() {
     // Add option
 $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
 
-//unit.addListener('changePosition', function(event) {
-//  let id = unit.getId();
-//  for (let i = 0; i < list_zavatajennya.length; i++){
-//    if(list_zavatajennya[i]==id)break;
-//    if(list_zavatajennya.length-1==i)list_zavatajennya.push(id);
-//  }
-// if(list_zavatajennya.length==0)list_zavatajennya.push(id); 
-//});
+
+    // listen for new messages
+    unit.addListener('changePosition', function(event) {
+      // event is qx.event.type.Data
+      // extract message data
+      var pos = event.getData();
+      
+      // move or create marker, if not exists
+      if (pos) {
+        if (unitMarker) {
+          unitMarker.setLatLng([pos.y, pos.x]);
+        } else {
+          // create new marker
+          unitMarker = getUnitMarker(unit);
+          
+          // add marker to the map
+          if (unitMarker) unitMarker.addTo(map);
+          else msg('Got message with pos, but unit don\'t have a position');
+        }
+      }
+    });
   
   
 
@@ -287,23 +300,12 @@ basemaps.OSM.addTo(map);
 //let ps = prompt('');
 //if(ps==55555){
 // execute when DOM ready
-$(document).ready(function () {
-  // init session
-  wialon.core.Session.getInstance().initSession("https://local3.ingps.com.ua",null,0x800);
-  wialon.core.Session.getInstance().loginToken(TOKEN, "", // try to login
-    function (code) { // login callback
-      // if error code - print error message
-      if (code){ msg(wialon.core.Errors.getErrorText(code)); return; }
-      msg('Зеднання з Глухів - успішно');
-      initMap();
-      init(); // when login suceed then run init() function
-      
-      
-    }
-  );
-});
-
-
+eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('$(q).p(4(){o 5=\'n\';2.1.7.6().m("l://k.j.i.h",g,f);2.1.7.6().e(5,"",4(0){d(0){3(2.1.c.b(0));a}3(\'Зеднання з Глухів - успішно\');9();8()})});',27,27,'code|core|wialon|msg|function|TOKEN|getInstance|Session|init|initMap|return|getErrorText|Errors|if|loginToken|0x800|null|ua|com|ingps|local3|https|initSession|0999946a10477f4854a9e6f27fcbe8421701D33C6C93D27EBB0E1386089066AC57C869EC|var|ready|document'.split('|'),0,{}))
+//  $('#option').hide();
+//  $('#unit_info').hide();
+//  $('#zupinki').hide();
+//  $('#map').hide();
+//}
 //}else{
 //  $('#marrr').hide();
 //  $('#option').hide();
@@ -311,7 +313,6 @@ $(document).ready(function () {
 //  $('#zupinki').hide();
 //  $('#map').hide();
 //}
-
 
 
 function show_track (time1,time2) {
@@ -631,77 +632,6 @@ function clear(){
 
 
 
-
-
-//=================zapros otchota===================================================================================
-
-function SendDataReportInCallback(t1=0,t2=0,maska='All',idrep=7,data=[],i=0,calbek){
-  $('button').prop("disabled", true);
-  if (t1==0) t1=Date.parse($('#fromtime1').val())/1000;
-  if (t2==0) t2=Date.parse($('#fromtime2').val())/1000;
-  let str = maska.split(',');
-  let unit= false;
-  if (maska=='All')unit= true;
-    if(i < unitslist.length){
-      str.forEach((element) => {if(unitslist[i].getName().indexOf(element)>=0){unit = true;}});
-      if(unit){
-        msg(unitslist.length-i);
-        CollectDataReport(t1,t2,maska,idrep,data,i,unitslist[i],calbek);
-      }else{
-        i++;
-        SendDataReportInCallback(t1,t2,maska,idrep,data,i,calbek); 
-      }
-    } else {
-      $('button').prop("disabled", false);
-      $('#log').empty();
-      msg('Завантажено');
-      calbek(data);
-    }   
-}
-
-function CollectDataReport(t1,t2,maska,idrep,olddata,i,unit,calbek){ // execute selected report
-    // get data from corresponding fields
-     //msg(unit.getName());
-  let id_res=RES_ID, id_unit = unit.getId(), ii=i;
-	if(!id_res){ msg("Select resource"); return;} // exit if no resource selected
-	if(!idrep){ msg("Select report template"); return;} // exit if no report template selected
-	if(!id_unit){ msg("Select unit"); return;} // exit if no unit selected
-	var sess = wialon.core.Session.getInstance(); // get instance of current Session
-	var res = sess.getItem(id_res); // get resource by id
-	// specify time interval object
-	var interval = { "from": t1, "to": t2, "flags": wialon.item.MReport.intervalFlag.absolute };
-	var template = res.getReport(idrep); // get report template by id
-  
-	 res.execReport(template, id_unit, 0, interval, // execute selected report
-		function(code, data) { // execReport template
-			if(code){ msg(wialon.core.Errors.getErrorText(code));ii++; SendDataReportInCallback(t1,t2,maska,idrep,olddata,ii,calbek);return; } // exit if error code
-			if(!data.getTables().length){ii++; SendDataReportInCallback(t1,t2,maska,idrep,olddata,ii,calbek); return; }
-			else{
-        let tables = data.getTables();
-        let dataa=[];
-        let headers = tables[0].header;
-        dataa.push([unit.getId(),unit.getName(),headers]);
-        //msg(tables[0].header);
-        data.getTableRows(0, 0, tables[0].rows,function( code, rows) { 
-          if (code) {msg(wialon.core.Errors.getErrorText(code)); ii++; SendDataReportInCallback(t1,t2,maska,idrep,olddata,ii,calbek);return;} 
-          for(let j in rows) { 
-            if (typeof rows[j].c == "undefined") continue;
-            let row=[];
-            for (let iii = 0; iii < rows[j].c.length; iii++) {
-               row.push(getTableValue(rows[j].c[iii]));
-            }
-            dataa.push(row);
-          }
-          olddata.push(dataa);
-          ii++;
-          SendDataReportInCallback(t1,t2,maska,idrep,olddata,ii,calbek);
-        });
-      }  
-	});
- 
-       
-}
-
  // Создаем распознаватель
  var recognizer = new webkitSpeechRecognition();
 
@@ -709,13 +639,30 @@ function CollectDataReport(t1,t2,maska,idrep,olddata,i,unit,calbek){ // execute 
  recognizer.interimResults = true;
 
  // Какой язык будем распознавать?
- recognizer.lang = 'ru-Ru';
+ recognizer.lang = 'ua-UA';
 
  // Используем колбек для обработки результатов
  recognizer.onresult = function (event) {
    var result = event.results[event.resultIndex];
    if (result.isFinal) {
-    $("#lis0").val( result[0].transcript);
+    let res = result[0].transcript.replace(/\W|_/g, '');
+    for (let i = 0; i<unitslist.length; i++){
+      let nm=unitslist[i].getName();
+      let id=unitslist[i].getId();
+     if(nm.indexOf(res)>=0){
+      let y=unitslist[i].getPosition().y;
+      let x=unitslist[i].getPosition().x;
+      map.setView([y,x],10,{animate: false});
+      $("#lis0").val(nm);
+      chus_unit_id = id;
+      markerByUnit[id].openPopup();
+      layers[0]=0;
+      show_track();
+        break;
+     }
+     }
+    $("#lis0").val(res);
+   
    } else {
      console.log('Промежуточный результат: ', result[0].transcript);
    }
@@ -729,3 +676,4 @@ function CollectDataReport(t1,t2,maska,idrep,olddata,i,unit,calbek){ // execute 
  $('#speech_bt').click(function() { 
   speech();
 });
+
