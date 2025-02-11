@@ -584,7 +584,7 @@ if(window.DeviceOrientationEvent) {
     // Check for iOS property
     if(event.webkitCompassHeading) {
       alpha = event.webkitCompassHeading;
-    if (my_icon){ my_icon.setRotationAngle(alpha+180);}
+    if (my_icon){ my_icon.setRotationAngle(alpha-180);}
     }
     // non iOS
     else {
@@ -593,7 +593,7 @@ if(window.DeviceOrientationEvent) {
         // Assume Android stock
         alpha = alpha-270; 
       }
-      if (my_icon){ my_icon.setRotationAngle(alpha+180);}
+      if (my_icon){ my_icon.setRotationAngle(alpha-180);}
     }
   });
 }
