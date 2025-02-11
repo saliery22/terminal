@@ -570,7 +570,7 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
   }else{
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
-      L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 230, 4)',weight:2,opacity:1}).addTo(map);
+      L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
       y_pr=position.coords.latitude;
       x_pr=position.coords.longitude;
     }
@@ -584,7 +584,7 @@ if(window.DeviceOrientationEvent) {
     // Check for iOS property
     if(event.webkitCompassHeading) {
       alpha = event.webkitCompassHeading;
-    if (my_icon){ my_icon.setRotationAngle(alpha);}
+    if (my_icon){ my_icon.setRotationAngle(alpha+180);}
     }
     // non iOS
     else {
@@ -593,7 +593,7 @@ if(window.DeviceOrientationEvent) {
         // Assume Android stock
         alpha = alpha-270; 
       }
-      if (my_icon){ my_icon.setRotationAngle(alpha);}
+      if (my_icon){ my_icon.setRotationAngle(alpha+180);}
     }
   });
 }
