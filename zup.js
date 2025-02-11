@@ -591,10 +591,10 @@ if(window.DeviceOrientationEvent) {
       alpha = event.alpha;
       if(!window.chrome) {
         // Assume Android stock
-        alpha = alpha-270; 
+        alpha = alpha+270; 
       }
       if (my_icon){ my_icon.setRotationAngle(-alpha);}
-	    console.log(alpha)
+	
     }
   });
 }
