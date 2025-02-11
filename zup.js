@@ -32,7 +32,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 50;
+  var imsaze = 32;
   if (!unitPos) return null;
     
 
@@ -41,7 +41,8 @@ function getUnitMarker(unit) {
     clickable: true,
     draggable: true,
     icon: L.icon({
-      iconUrl: unit.getIconUrl(imsaze),
+      iconUrl: unit.getIconUrl(),
+      iconSize:   [imsaze, imsaze],
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
@@ -309,7 +310,7 @@ function initMap() {
 layerControl=L.control.layers(basemaps).addTo(map);
 
 basemaps.OSM.addTo(map);
-  
+
 
 
 }
@@ -559,8 +560,8 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
       icon: L.icon({
         iconUrl: '111.png',
-        iconSize:   [50, 50],
-        iconAnchor: [25, 25] // set icon center
+        iconSize:   [30, 30],
+        iconAnchor: [15, 15] // set icon center
       })
     }).addTo(map);
   }else{
