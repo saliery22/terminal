@@ -32,7 +32,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 32;
+  var imsaze = 38;
   if (!unitPos) return null;
     
 
@@ -289,7 +289,7 @@ function initMap() {
   // create a map in the "map" div, set the view to a given place and zoom
   map = L.map('map', {
     // disable zooming, because we will use double-click to set up marker
-    doubleClickZoom: false,
+    doubleClickZoom: true,
     animate: false
   }).setView([51.62995, 33.64288], 9);
   
@@ -310,8 +310,6 @@ function initMap() {
 layerControl=L.control.layers(basemaps).addTo(map);
 
 basemaps.OSM.addTo(map);
-
-
 
 }
 
@@ -558,6 +556,7 @@ let my_icon=null;
 let watchID = navigator.geolocation.watchPosition(function(position) {
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
+      rotationAngle: 0,
       icon: L.icon({
         iconUrl: '111.png',
         iconSize:   [30, 30],
@@ -568,3 +567,23 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
     unitMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
   } 
 });
+
+if(window.DeviceOrientationEvent) {
+  window.addEventListener('deviceorientation', function(event) {
+    var alpha;
+    // Check for iOS property
+    if(event.webkitCompassHeading) {
+      alpha = event.webkitCompassHeading;
+    if (my_icon){ my_icon.setRotationAngle(alpha);}
+    }
+    // non iOS
+    else {
+      alpha = event.alpha;
+      if(!window.chrome) {
+        // Assume Android stock
+        alpha = alpha-270;
+        if (my_icon){ my_icon.setRotationAngle(alpha);}
+      }
+    }
+  });
+}
