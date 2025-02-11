@@ -32,7 +32,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 38;
+  var imsaze = 42;
   if (!unitPos) return null;
     
 
@@ -553,6 +553,8 @@ $('#speech_me_bt').click(function() {
 });
 
 let my_icon=null;
+let y_pr=0;
+let x_pr=0;
 let watchID = navigator.geolocation.watchPosition(function(position) {
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
@@ -563,8 +565,16 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
         iconAnchor: [15, 15] // set icon center
       })
     }).addTo(map);
+    y_pr=position.coords.latitude;
+    x_pr=position.coords.longitude;
   }else{
-    unitMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+    if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
+      my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
+      L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 230, 4)',weight:2,opacity:1}).addTo(map);
+      y_pr=position.coords.latitude;
+      x_pr=position.coords.longitude;
+    }
+   
   } 
 });
 
@@ -581,9 +591,9 @@ if(window.DeviceOrientationEvent) {
       alpha = event.alpha;
       if(!window.chrome) {
         // Assume Android stock
-        alpha = alpha-270;
-        if (my_icon){ my_icon.setRotationAngle(alpha);}
+        alpha = alpha-270; 
       }
+      if (my_icon){ my_icon.setRotationAngle(alpha);}
     }
   });
 }
