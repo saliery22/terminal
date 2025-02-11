@@ -23,19 +23,6 @@ var currentPos = null, currentUnit = null;
 var isUIActive = true;
 
 
-var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-
-var from111 = new Date().toJSON().slice(0,11) + '00:00';
-var from222 = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -8);
-
-
-
-$('#fromtime1').val(from111);
-$('#fromtime2').val(from222);
-$('#log_time_inp').val(new Date().toJSON().slice(0,10));
-
-
-
 
 // Unit markers constructor
 let chus_unit_id=0;
@@ -58,7 +45,16 @@ function getUnitMarker(unit) {
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
-  marker.bindPopup('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t));
+ let fuel = '----';
+ let sens = unit.getSensors(); // get unit's sensors
+ for (key in sens) {
+  if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+    fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+    if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed()} 
+  }
+}
+
+  marker.bindPopup('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t)+'<br />' +fuel+'л');
   marker.on('click', function(e) {
   
     // select unit in UI
@@ -96,15 +92,15 @@ function init() { // Execute after login succeed
   // get instance of current Session
   var session = wialon.core.Session.getInstance();
   // specify what kind of data should be returned
-  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition;
-  var res_flags = wialon.item.Item.dataFlag.base | wialon.item.Resource.dataFlag.reports | wialon.item.Resource.dataFlag.zones| wialon.item.Resource.dataFlag.zoneGroups;
+  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition | wialon.item.Unit.dataFlag.sensors | wialon.item.Unit.dataFlag.lastMessage;
+  var res_flags = wialon.item.Item.dataFlag.base | wialon.item.Resource.dataFlag.zones| wialon.item.Resource.dataFlag.zoneGroups;
  
 	var remote= wialon.core.Remote.getInstance();
   remote.remoteCall('render/set_locale',{"tzOffset":7200,"language":'ru',"formatDate":'%Y-%m-%E %H:%M:%S'});
   wialon.util.Gis.geocodingParams.flags =1490747392;//{flags: "1255211008", city_radius: "10", dist_from_unit: "5", txt_dist: "km from"};
 	session.loadLibrary("resourceZones"); // load Geofences Library 
-  session.loadLibrary("resourceReports"); // load Reports Library
   session.loadLibrary("resourceZoneGroups"); // load Reports Library
+  session.loadLibrary("unitSensors");
 
   // load Icon Library
   session.loadLibrary('itemIcon');
@@ -121,17 +117,6 @@ function init() { // Execute after login succeed
       } else {
         areUnitsLoaded = true;
         msg('Техніка завнтажена - успішно');
-        var res = session.getItem(RES_ID);
-        var templ = res.getReports(); // get reports templates for resource
-	      for(var i in templ){
-		    if (templ[i].ct != "avl_unit") continue; // skip non-unit report templates
-		    // add report template to select list
-		     //console.log(templ[i].id +"     "+ templ[i].n+ + '\n' );
-         if(templ[i].n=="яx001") {zvit1=templ[i].id; msg('звіт зливи      1/4 завінтажено');}
-         if(templ[i].n=="яx002") {zvit2=templ[i].id; msg('звіт трасування 2/4 завінтажено');}
-         if(templ[i].n=="яx003") {zvit3=templ[i].id; msg('звіт зупинки    3/4 завінтажено');}
-         if(templ[i].n=="яx004") {zvit4=templ[i].id; msg('звіт підсумок   4/4 завінтажено');}
-	      }
         // add received data to the UI, setup UI events
         initUIData();
       }
@@ -234,8 +219,16 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
       if (pos) {
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
+           let fuel = '----';
+          let sens = unit.getSensors(); // get unit's sensors
+          for (key in sens) {
+            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed()}
+            }
+          }
           let pop = unitMarker.getPopup();
-          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t));
+          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t)+'<br />' +fuel+'л');
         } else {
           // create new marker
           unitMarker = getUnitMarker(unit);
@@ -259,6 +252,28 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
   });
 
  
+  session.searchItems({itemsType: "avl_unit_group", propName: "", propValueMask: "", sortType: "sys_name"},true, 1, 0, 0, function(code, data) {
+    if (code) {
+        msg(wialon.core.Errors.getErrorText(code));
+        return;
+    }
+    let select = document.getElementById('grupi_avto');
+    for(let i = 0; i<data.items.length; i++){
+      let name = data.items[i].$$user_name;
+      let gr= '';
+      let grup_id = data.items[i].$$user_units;
+      grup_id.sort()
+      for(let ii = 0; ii<grup_id.length; ii++){
+        gr+=grup_id[ii]+',';
+      }
+      gr = gr.slice(0, -1);
+      unitsgrup[name] = gr;
+      if (grup_id.length>0) {
+        let newOption = new Option(name+" ("+data.items[i].$$user_units.length+")", name);
+         select.append(newOption);
+      }
+    }
+    });
  
     
 }
@@ -329,8 +344,10 @@ function show_track (time1,time2) {
     var to,from;
 
      if(time1 == undefined){
-     to = Date.parse($('#fromtime2').val())/1000; // end of day in seconds
-     from = Date.parse($('#fromtime1').val())/1000; // get begin time - beginning of day
+     //to = Date.parse($('#fromtime2').val())/1000; // end of day in seconds
+     //from = Date.parse($('#fromtime1').val())/1000; // get begin time - beginning of day
+      to = sess.getServerTime(); // get current server time (end time of report time interval)
+	    from = to - 7200; // calculate start time of report
     }else{
     to = Date.parse(time2)/1000;
     from = Date.parse(time1)/1000;
@@ -426,195 +443,6 @@ function show_track (time1,time2) {
 }
 
 
-
-
-
-
-
-
-
-
-
-//=================Data===================================================================================
-Global_DATA=[];
-function UpdateGlobalData(t2=0,idrep=zvit2,i=0){
-    if(i==0){
-     $('#eeew').prop("disabled", true);
-     if($('#fromtime1').val()!=from111 || $('#fromtime2').val()!=from222){
-       Global_DATA = [];
-       from111=$('#fromtime1').val();
-       from222=$('#fromtime2').val();
-       t2=Date.parse($('#fromtime2').val())/1000;
-      }else{ 
-       from222 =(new Date(Date.now() - tzoffset)).toISOString().slice(0, -8);
-       $('#fromtime2').val(from222);
-       t2=Date.parse($('#fromtime2').val())/1000;
-      }
-    } 
-    if(i < unitslist.length){
-        $('#log').empty();
-        let ld=unitslist.length-i;
-        let pr=100-Math.round(ld*100/unitslist.length);
-        let pr1="";
-        let pr2="";
-        for (let j=0; j<pr; j++){ pr1+="|";}
-        for (let j=0; j<100-pr; j++){ pr2+=":";}
-        msg("["+pr1+pr2+"] "+ld);
-        CollectGlobalData(t2,idrep,i,unitslist[i]);
-    } else {
-      $('button').prop("disabled", false);
-      $('#log').empty();
-      msg('Завантажено  ---'+from222);
-    }   
-}
-
-let list_zavatajennya=[];
-function CollectGlobalData(t2,idrep,i,unit){ // execute selected report
-  let id_res=RES_ID, id_unit = unit.getId(), ii=i;
-  if(Global_DATA[ii]==undefined){Global_DATA.push([[id_unit,unit.getName(),Date.parse($('#fromtime1').val())/1000]])}
-  let t1=Global_DATA[ii][0][2];
-  if($('#uni_data').val()!="All"){
-  let str =$('#uni_data').val().split(',');
-  let ok=0;
-  str.forEach((element) => {if(unit.getName().indexOf(element)>=0){ok=1}});
-  if(ok==0){ii++; UpdateGlobalData(t2,idrep,ii);return;}
-  }
-  //if($("#gif").is(":checked")) {for (let iii=0; iii<list_zavatajennya.length; iii++){if(list_zavatajennya[iii]==id_unit){break;}if(list_zavatajennya[iii].length-1==iii){ii++; UpdateGlobalData(t2,idrep,ii);return;}}}
-	if(!id_res){ msg("Select resource"); return;} // exit if no resource selected
-	if(!idrep){ msg("Select report template"); return;} // exit if no report template selected
-	if(!id_unit){ msg("Select unit"); return;} // exit if no unit selected
-	var sess = wialon.core.Session.getInstance(); // get instance of current Session
-	var res = sess.getItem(id_res); // get resource by id
-	// specify time interval object
-	var interval = { "from": t1, "to": t2, "flags": wialon.item.MReport.intervalFlag.absolute };
-	var template = res.getReport(idrep); // get report template by id
-  
-	 res.execReport(template, id_unit, 0, interval, // execute selected report
-		function(code, data) { // execReport template
-			if(code){ msg(wialon.core.Errors.getErrorText(code));ii++; UpdateGlobalData(t2,idrep,ii);return; } // exit if error code
-			if(!data.getTables().length){ii++; UpdateGlobalData(t2,idrep,ii); return; }
-			else{
-        let tables = data.getTables();
-        let headers = tables[0].header;
-        let it=0;
-        let litry=0;
-        let datt=0;
-        for (let j=4; j<headers.length; j++) {if (headers[j].indexOf('Топливо')>=0 || headers[j].indexOf('Паливо')>=0){it=j;}}
-        data.getTableRows(0, 0, tables[0].rows,function( code, rows) { 
-          if (code) {msg(wialon.core.Errors.getErrorText(code)); ii++; UpdateGlobalData(t2,idrep,ii);return;} 
-          for(let j in rows) { 
-            if (typeof rows[j].c == "undefined") continue;
-            //if (j>0 && getTableValue(rows[j].c[0]) == getTableValue(rows[j-1].c[0]) ) continue;
-            litry=0;
-            if (it>0) litry=getTableValue(rows[j].c[it]); 
-            datt= Date.parse(getTableValue(rows[j].c[1]));
-            Global_DATA[ii].push([getTableValue(rows[j].c[0]),getTableValue(rows[j].c[1]),litry,getTableValue(rows[j].c[2]),datt,getTableValue(rows[j].c[4]),getTableValue(rows[j].c[3])]);
-            Global_DATA[ii][0][2]=datt/1000+1;
-          }
-          ii++;
-          UpdateGlobalData(t2,idrep,ii);
-        });
-      }  
-	});       
-}
-
-
-
-
-function getTableValue(data) { // calculate ceil value
-	if (typeof data == "object")
-		if (typeof data.t == "string") return data.t; else return "";
-	else return data;
-}
-
-
-var slider = document.getElementById("myRange");
-var output = document.getElementById("f");
-
-
-// Update the current slider value (each time you drag the slider handle)
-//slider.oninput = function() {
- //   var interval = Date.parse($('#fromtime1').val())+(Date.parse($('#fromtime2').val())-Date.parse($('#fromtime1').val()))/2000*this.value;
- //   position(interval);
-//}
-
-document.addEventListener('keydown', function(event) {
-	if(event.code == "KeyA"){
-    let t=Date.parse($('#f').text())-3000;
-    if(t<Date.parse($('#fromtime1').val()))t=Date.parse($('#fromtime1').val());
-    slider.value=(t-Date.parse($('#fromtime1').val()))/(Date.parse($('#fromtime2').val())-Date.parse($('#fromtime1').val()))*2000;
-    position(t);
-  }
-  if(event.code == "KeyD"){
-    let t=Date.parse($('#f').text())+3000;
-    if(t>Date.parse($('#fromtime2').val()))t=Date.parse($('#fromtime2').val());
-    slider.value=(t-Date.parse($('#fromtime1').val()))/(Date.parse($('#fromtime2').val())-Date.parse($('#fromtime1').val()))*2000;
-    position(t);
-  }
-});
-
-function position(t)  {
-  var interval = t;
-  var id=0;
-  var calk=true;
-  var cur_day1111 = new Date(interval);
-  var month2 = cur_day1111.getMonth()+1;   
-  var from2222 = cur_day1111.getFullYear() + '-' + (month2 < 10 ? '0' : '') + month2 + '-' + cur_day1111.getDate()+ ' ' + cur_day1111.getHours()+ ':' + cur_day1111.getMinutes()+ ':' + cur_day1111.getSeconds();
-  output.innerHTML = from2222;
-  var x,y,markerrr;
-    for(let ii = 0; ii<Global_DATA.length; ii++){
-     if(Global_DATA[ii].length<5) continue;
-     let ind=1;
-     id=Global_DATA[ii][0][0];
-     if(filtr==true){
-      calk=false;
-      for(let v = 0; v<filtr_data.length; v++){ 
-        if(filtr_data[v]==id){
-          calk=true;
-          break;
-        } 
-      } 
-     }
-     if(calk==false) continue;
-
-     markerrr = markerByUnit[id];
-     if (markerrr){
-      if(rux == 1){var opt = markerrr.options.opacity;if(opt>0.02)markerrr.setOpacity(opt*0.97);}
-     for(let iii = Global_DATA[ii].length-1; iii>0; iii-=200){
-      if(interval>Global_DATA[ii][iii][4]) {ind=iii;break;}
-     }
-     for(let i = ind; i<Global_DATA[ii].length; i++){
-         if(interval<Global_DATA[ii][i][4]){
-           if(Global_DATA[ii][i][0]=="")continue;
-            y = parseFloat(Global_DATA[ii][i][0].split(',')[0]);
-            x = parseFloat(Global_DATA[ii][i][0].split(',')[1]);
-            markerrr.setLatLng([y, x]); 
-            markerrr.bindPopup('<center><font size="1">'+Global_DATA[ii][0][1] +'<br />' +Global_DATA[ii][i][1]+ '<br />' +Global_DATA[ii][i][3]+ '<br />' +Global_DATA[ii][i][2]+'л'+ '<br />' +Global_DATA[ii][i][5]+ '<br />' +Global_DATA[ii][i][6]);
-            if(rux == 1){if (Global_DATA[ii][i][3][0]!='0' ) {markerrr.setOpacity(1);}}
-            if(agregat == 21){ if (Global_DATA[ii][i][5][0]=='Д' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 22){ if (Global_DATA[ii][i][5][0]=='К' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 23){ if (Global_DATA[ii][i][5][0]=='Б' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 24){ if (Global_DATA[ii][i][5][0]=='Г' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 25){ if (Global_DATA[ii][i][5][0]=='П' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 26){ if (Global_DATA[ii][i][5][0]=='Р' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            //if(rux == 27){ if (Global_DATA[ii][i][5][0]=='О' ) {markerrr.setOpacity(1);}else{markerrr.setOpacity(0);}}
-            if(agregat == 28){ if (Global_DATA[ii][i][5][0]=='С' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 29){ if (Global_DATA[ii][i][5][0]=='Ж' ) {if(rux == 0){markerrr.setOpacity(1);}}else{markerrr.setOpacity(0);}}
-            if(agregat == 30){ if (Global_DATA[ii][i][5][0]!=null ) {markerrr.setOpacity(0);}}
-            break;
-          }
-     }
-    }
-  }
-}
-    
-
- 
-
-    
-
-
-
  
 function clear(){  
  
@@ -631,7 +459,48 @@ function clear(){
  }
 
 
+ $( "#grupi_avto" ).on( "change", function() {
+  chuse(this.value);
+ });
 
+
+function chuse(vibor) {
+  var nmm,mm,idd;
+  let str = null;
+  if (unitsgrup[vibor]){ str = unitsgrup[vibor].split(','); }
+
+
+
+  
+for(var i=0; i < allunits.length; i++){
+idd =allunits[i].getId();
+mm = markerByUnit[idd];
+ mm.setOpacity(0);
+
+ if (str){
+ str.forEach((element) => {
+  if(idd==element){
+    mm.setOpacity(1);
+    mm.setZIndexOffset(1000);
+  }
+});
+ continue;
+ }
+
+
+      
+}
+}
+
+
+function Clrar_no_activ(){
+for(var i=0; i < allunits.length; i++){
+ if (Date.parse($('#fromtime2').val())/1000-432000> allunits[i].getPosition().t ){
+ let mm = markerByUnit[allunits[i].getId()];
+ mm.setOpacity(0);
+ }
+}
+}
 
 
 
@@ -680,3 +549,21 @@ function clear(){
   speech();
 });
 
+$('#speech_me_bt').click(function() { 
+  if (my_icon){ map.setView(my_icon.getLatLng());}
+});
+
+let my_icon=null;
+let watchID = navigator.geolocation.watchPosition(function(position) {
+  if (!my_icon){
+    my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
+      icon: L.icon({
+        iconUrl: '111.png',
+        iconSize:   [50, 50],
+        iconAnchor: [25, 25] // set icon center
+      })
+    }).addTo(map);
+  }else{
+    unitMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+  } 
+});
