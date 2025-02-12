@@ -558,6 +558,11 @@ $('#speech_me_bt').click(function() {
 let my_icon=null;
 let y_pr=0;
 let x_pr=0;
+var geo_options = {
+  enableHighAccuracy: true,
+  maximumAge: 30000,
+  timeout: 27000,
+};
 let watchID = navigator.geolocation.watchPosition(function(position) {
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
@@ -579,7 +584,7 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
     }
    
   } 
-});
+},geo_options);
 
 if(window.DeviceOrientationEvent) {
   window.addEventListener('deviceorientation', function(event) {
@@ -587,7 +592,7 @@ if(window.DeviceOrientationEvent) {
     // Check for iOS property
     if(event.webkitCompassHeading) {
       alpha = event.webkitCompassHeading;
-    if (my_icon){ my_icon.setRotationAngle(-alpha);}
+    if (my_icon){ my_icon.setRotationAngle(360-alpha);}
     }
     // non iOS
     else {
@@ -596,7 +601,8 @@ if(window.DeviceOrientationEvent) {
         // Assume Android stock
         alpha = alpha+270; 
       }
-      if (my_icon){ my_icon.setRotationAngle(-alpha);}
+      if (my_icon){ my_icon.setRotationAngle(360-alpha);}
     }
   });
 }
+
