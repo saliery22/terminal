@@ -220,6 +220,9 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
       if (pos) {
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
+
+          if (rux == 1){unitMarker.setOpacity(1);}
+    
            let fuel = '----';
           let sens = unit.getSensors(); // get unit's sensors
           for (key in sens) {
@@ -274,6 +277,8 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
          select.append(newOption);
       }
     }
+    select.innerHTML +='<option value="v00">В РУСІ</option>';
+    //console.log(unitsgrup);
     });
  
     
@@ -467,8 +472,8 @@ function chuse(vibor) {
   var nmm,mm,idd;
   let str = null;
   if (unitsgrup[vibor]){ str = unitsgrup[vibor].split(','); }
-
-
+  rux = 0;
+  if (!str){rux = 1;}
 
   
 for(var i=0; i < allunits.length; i++){
@@ -485,7 +490,6 @@ mm = markerByUnit[idd];
 });
  continue;
  }
-
 
       
 }
@@ -584,7 +588,7 @@ if(window.DeviceOrientationEvent) {
     // Check for iOS property
     if(event.webkitCompassHeading) {
       alpha = event.webkitCompassHeading;
-    if (my_icon){ my_icon.setRotationAngle(-alpha);}
+    if (my_icon){ my_icon.setRotationAngle(-alpha+90);}
     }
     // non iOS
     else {
@@ -593,8 +597,7 @@ if(window.DeviceOrientationEvent) {
         // Assume Android stock
         alpha = alpha+270; 
       }
-      if (my_icon){ my_icon.setRotationAngle(-alpha);}
-	
+      if (my_icon){ my_icon.setRotationAngle(-alpha+90);}
     }
   });
 }
