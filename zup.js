@@ -1,26 +1,16 @@
 
 
 // global variables
-var map, marker,unitslist = [],allunits = [],rest_units = [],marshruts = [],zup = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},marshrutMarkers = [],unitsID = {},Vibranaya_zona;
+var map, marker,unitslist = [],allunits = [],rest_units = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},unitsID = {},Vibranaya_zona;
 var areUnitsLoaded = false;
-var marshrutID=99;
-var cklikkk=0;
-var markerstart =0;
-var markerend =0;
+
 var rux=1;
-var agregat=0;
-let zvit1=0;
-let zvit2=0;
-let zvit3=0;
-let zvit4=0;
+
 let RES_ID=26227;// 20030 "11_ККЗ"  26227 "KKZ_Gluhiv"
 
 
 
-// for refreshing
-var currentPos = null, currentUnit = null;
 
-var isUIActive = true;
 
 
 
