@@ -548,12 +548,12 @@ $('#speech_me_bt').click(function() {
 let my_icon=null;
 let y_pr=0;
 let x_pr=0;
-var geo_options = {
+let geo_options = {
   enableHighAccuracy: true,
   maximumAge: 30000,
   timeout: 27000,
 };
-let watchID = navigator.geolocation.watchPosition(function(position) {
+function success(position) {
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
       rotationAngle: 0,
@@ -574,7 +574,14 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
     }
    
   } 
-},geo_options);
+
+}
+
+function error() {
+
+}
+let watchID = navigator.geolocation.watchPosition(success, error, geo_options);
+
 
 if(window.DeviceOrientationEvent) {
   window.addEventListener('deviceorientation', function(event) {
