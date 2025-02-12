@@ -595,7 +595,7 @@ if(window.DeviceOrientationEvent) {
     else {
 
       alpha = -(event.alpha + event.beta * event.gamma / 90);
-      alpha -= Math.floor(compass / 360) * 360; // Wrap into range [0,360].
+      alpha -= Math.floor(alpha / 360) * 360; // Wrap into range [0,360].
       if(!window.chrome) {
         // Assume Android stock
          //alpha = alpha+270; 
