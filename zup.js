@@ -7,7 +7,7 @@ var marshrutID=99;
 var cklikkk=0;
 var markerstart =0;
 var markerend =0;
-var rux=0;
+var rux=1;
 var agregat=0;
 let zvit1=0;
 let zvit2=0;
@@ -32,7 +32,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 42;
+  var imsaze = 48;
   if (!unitPos) return null;
     
 
@@ -40,6 +40,7 @@ function getUnitMarker(unit) {
   marker = L.marker([unitPos.y, unitPos.x], {
     clickable: true,
     draggable: true,
+    opacity: 0,
     icon: L.icon({
       iconUrl: unit.getIconUrl(),
       iconSize:   [imsaze, imsaze],
@@ -277,8 +278,6 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
          select.append(newOption);
       }
     }
-    select.innerHTML +='<option value="v00">В РУСІ</option>';
-    //console.log(unitsgrup);
     });
  
     
@@ -565,8 +564,8 @@ let watchID = navigator.geolocation.watchPosition(function(position) {
       rotationAngle: 0,
       icon: L.icon({
         iconUrl: '111.png',
-        iconSize:   [30, 30],
-        iconAnchor: [15, 15] // set icon center
+        iconSize:   [40, 40],
+        iconAnchor: [20, 20] // set icon center
       })
     }).addTo(map);
     y_pr=position.coords.latitude;
