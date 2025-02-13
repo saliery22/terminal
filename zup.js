@@ -33,6 +33,7 @@ function getUnitMarker(unit) {
     opacity: 0,
     icon: L.icon({
       iconUrl: unit.getIconUrl(),
+      zIndexOffset: -2000,
       iconSize:   [imsaze, imsaze],
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
@@ -195,7 +196,10 @@ function initUIData() {
 
   units.forEach(function(unit) {          
     var unitMarker = getUnitMarker(unit);
-    if (unitMarker) unitMarker.addTo(map);
+    if (unitMarker){
+      unitMarker.addTo(map);
+      unitMarker.setZIndexOffset(-2000);
+    } 
     
     // Add option
 $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
@@ -212,7 +216,10 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
 
-          if (rux == 1){unitMarker.setOpacity(1);}
+          if (rux == 1){
+            unitMarker.setOpacity(1);
+            unitMarker.setZIndexOffset(-1000);
+          }
     
            let fuel = '----';
           let sens = unit.getSensors(); // get unit's sensors
@@ -304,6 +311,7 @@ function initMap() {
 layerControl=L.control.layers(basemaps).addTo(map);
 
 basemaps.OSM.addTo(map);
+
 
 }
 
@@ -469,12 +477,13 @@ for(var i=0; i < allunits.length; i++){
 idd =allunits[i].getId();
 mm = markerByUnit[idd];
  mm.setOpacity(0);
+ mm.setZIndexOffset(-2000);
 
  if (str){
  str.forEach((element) => {
   if(idd==element){
     mm.setOpacity(1);
-    mm.setZIndexOffset(900);
+    mm.setZIndexOffset(-1000);
   }
 });
  continue;
