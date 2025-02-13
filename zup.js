@@ -595,11 +595,13 @@ function success(position) {
     y_pr=position.coords.latitude;
     x_pr=position.coords.longitude;
   }else{
+    if(position.coords.accuracy<200)my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
+    if(position.coords.accuracy<20){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
-      my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
-      L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
-      y_pr=position.coords.latitude;
-      x_pr=position.coords.longitude;
+        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
+        y_pr=position.coords.latitude;
+        x_pr=position.coords.longitude;
+      }
     }
    
   } 
