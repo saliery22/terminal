@@ -495,6 +495,25 @@ for(var i=0; i < allunits.length; i++){
 }
 
 
+$('#serch_bt').click(function() { 
+  let res = $("#lis0").val();
+  for (let i = 0; i<unitslist.length; i++){
+    let nm=unitslist[i].getName();
+    let id=unitslist[i].getId();
+   if(nm.indexOf(res)>=0){
+    let y=unitslist[i].getPosition().y;
+    let x=unitslist[i].getPosition().x;
+    map.setView([y,x]);
+    $("#lis0").val(nm);
+    chus_unit_id = id;
+    markerByUnit[id].openPopup();
+    layers[0]=0;
+    show_track();
+      break;
+   }
+   }
+});
+
 
  // Создаем распознаватель
  var recognizer = new webkitSpeechRecognition();
