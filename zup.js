@@ -474,7 +474,7 @@ mm = markerByUnit[idd];
  str.forEach((element) => {
   if(idd==element){
     mm.setOpacity(1);
-    mm.setZIndexOffset(1000);
+    mm.setZIndexOffset(900);
   }
 });
  continue;
@@ -577,6 +577,7 @@ function success(position) {
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
       rotationAngle: 0,
       icon: L.icon({
+        zIndexOffset: 1000,
         iconUrl: '111.png',
         iconSize:   [40, 40],
         iconAnchor: [20, 20] // set icon center
