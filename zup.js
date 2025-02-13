@@ -584,25 +584,26 @@ let watchID = navigator.geolocation.watchPosition(success, error, geo_options);
 
 
 if(window.DeviceOrientationEvent) {
-  window.addEventListener('deviceorientationabsolute', function(event) {
-    var alpha;
-    // Check for iOS property
-    if(event.webkitCompassHeading) {
-      alpha = event.webkitCompassHeading;
-    if (my_icon){ my_icon.setRotationAngle(360-alpha);}
+  let absoluteListener = (e) => {
+    if (!e.absolute || e.alpha == null || e.beta == null || e.gamma == null)
+        return;
+    let compass = -(e.alpha + e.beta * e.gamma / 90);
+    compass -= Math.floor(compass / 360) * 360; // Wrap into range [0,360].
+    if (my_icon){ my_icon.setRotationAngle(compass);}
+    window.removeEventListener("deviceorientation", webkitListener);
+};
+let webkitListener = (e) => {
+    let compass = e.webkitCompassHeading;
+    if (compass!=null && !isNaN(compass)) {
+      if (my_icon){ my_icon.setRotationAngle(compass);}
+        window.removeEventListener("deviceorientationabsolute", absoluteListener);
     }
-    // non iOS
-    else {
+}
 
-      alpha = -(event.alpha + event.beta * event.gamma / 90);
-      alpha -= Math.floor(alpha / 360) * 360; // Wrap into range [0,360].
-      if(!window.chrome) {
-        // Assume Android stock
-         //alpha = alpha+270; 
-      }
 
-      if (my_icon){ my_icon.setRotationAngle(alpha);}
-    }
-  });
+    window.addEventListener("deviceorientationabsolute", absoluteListener);
+    window.addEventListener("deviceorientation", webkitListener);
+
+
 }
 
