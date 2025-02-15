@@ -608,7 +608,7 @@ function success(position) {
          if(nm.indexOf(res)>=0){
           let y=unitslist[i].getPosition().y;
           let x=unitslist[i].getPosition().x;
-          if (!my_icon){
+          if (!my_line){
             my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
           }else{
             my_line.setLatLngs([y, x]);
