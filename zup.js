@@ -507,6 +507,7 @@ for(var i=0; i < allunits.length; i++){
 $('#serch_bt').click(function() { 
   let res = $("#lis0").val();
   for (let i = 0; i<unitslist.length; i++){
+    if(res=='')break;
     let nm=unitslist[i].getName();
     let id=unitslist[i].getId();
    if(nm.indexOf(res)>=0){
@@ -570,7 +571,10 @@ $('#serch_bt').click(function() {
 });
 
 $('#speech_me_bt').click(function() { 
-  if (my_icon){ map.setView(my_icon.getLatLng());}
+  if (my_icon){
+     map.closePopup();
+     map.setView(my_icon.getLatLng());
+    }
 });
 
 let my_icon=null;
@@ -600,6 +604,7 @@ function success(position) {
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
       let res = $("#lis0").val();
       for (let i = 0; i<unitslist.length; i++){
+        if(res=='')break;
         let nm=unitslist[i].getName();
        if(nm.indexOf(res)>=0){
         let y=unitslist[i].getPosition().y;
@@ -607,7 +612,7 @@ function success(position) {
         if (!my_line){
           my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:2,opacity:1}).addTo(map);
         }else{
-          my_line.setLatLngs([y, x],[position.coords.latitude,position.coords.longitude]);
+          my_line.setLatLngs([[y, x],[position.coords.latitude,position.coords.longitude]]);
         }
 
           break;
