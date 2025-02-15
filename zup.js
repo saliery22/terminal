@@ -596,28 +596,29 @@ function success(position) {
     y_pr=position.coords.latitude;
     x_pr=position.coords.longitude;
   }else{
-    if(position.coords.accuracy<200)my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
+    if(position.coords.accuracy<200){
+      my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
+      let res = $("#lis0").val();
+      for (let i = 0; i<unitslist.length; i++){
+        let nm=unitslist[i].getName();
+       if(nm.indexOf(res)>=0){
+        let y=unitslist[i].getPosition().y;
+        let x=unitslist[i].getPosition().x;
+        if (!my_line){
+          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
+        }else{
+          my_line.setLatLngs([y, x]);
+        }
+
+          break;
+       }
+       }
+    }
     if(position.coords.accuracy<10){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
         L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
         x_pr=position.coords.longitude;
-        let res = $("#lis0").val();
-        for (let i = 0; i<unitslist.length; i++){
-          let nm=unitslist[i].getName();
-         if(nm.indexOf(res)>=0){
-          let y=unitslist[i].getPosition().y;
-          let x=unitslist[i].getPosition().x;
-          if (!my_line){
-            my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
-          }else{
-            my_line.setLatLngs([y, x]);
-          }
-
-            break;
-         }
-         }
-      
       }
     }
    
