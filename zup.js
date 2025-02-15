@@ -605,9 +605,9 @@ function success(position) {
         let y=unitslist[i].getPosition().y;
         let x=unitslist[i].getPosition().x;
         if (!my_line){
-          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
+          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:2,opacity:1}).addTo(map);
         }else{
-          my_line.setLatLngs([y, x]);
+          my_line.setLatLngs([y, x],[position.coords.latitude,position.coords.longitude]);
         }
 
           break;
