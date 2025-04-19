@@ -525,8 +525,10 @@ $('#serch_bt').click(function() {
 });
 
 
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Создаем экземпляр `SpeechRecognition`
+const recognizer = new speechRecognition();
  // Создаем распознаватель
- var recognizer = new webkitSpeechRecognition();
 
  // Ставим опцию, чтобы распознавание началось ещё до того, как пользователь закончит говорить
  recognizer.interimResults = true;
