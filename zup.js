@@ -39,15 +39,29 @@ function getUnitMarker(unit) {
     })
   });
  let fuel = '----';
+ let vodiy ='----';
+ let agregat ='----';
+ let sped = unitPos.s;
+
  let sens = unit.getSensors(); // get unit's sensors
  for (key in sens) {
   if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
     fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-    if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed()} 
+    if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
+  }
+
+  if (sens[key].n=='Водитель'||sens[key].n=='РФИД') {
+    vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+    if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+  }
+
+  if (sens[key].n=='Прицеп') {
+    agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+    if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
   }
 }
 
-  marker.bindPopup('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t)+'<br />' +fuel+'л');
+  marker.bindPopup('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t)+'<br />' +sped+' км/год<br />' +fuel+'л' +'<br /> водій ' +vodiy+'<br />прицеп ' +agregat);
   marker.on('click', function(e) {
   
     // select unit in UI
@@ -216,21 +230,42 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
         if (unitMarker) {
           unitMarker.setLatLng([pos.y, pos.x]);
 
-          if (rux == 1){
-            unitMarker.setOpacity(1);
-            unitMarker.setZIndexOffset(-1000);
+
+          let sped = unit.getPosition().s;
+
+          if (rux == 1 ){
+            if(sped>0 ){
+              unitMarker.setOpacity(1);
+              unitMarker.setZIndexOffset(-1000);
+            }else{
+              unitMarker.setOpacity(0.3);
+            }
+            
           }
     
            let fuel = '----';
+           let vodiy ='----';
+           let agregat ='----';
           let sens = unit.getSensors(); // get unit's sensors
           for (key in sens) {
             if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
               fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed()}
+              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
+            }
+          
+            if (sens[key].n=='Водитель'||sens[key].n=='РФИД') {
+              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+            }
+          
+            if (sens[key].n=='Прицеп') {
+              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
             }
           }
           let pop = unitMarker.getPopup();
-          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t)+'<br />' +fuel+'л');
+          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t)+'<br />' +sped+' км/год'+'<br />' +fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          
         } else {
           // create new marker
           unitMarker = getUnitMarker(unit);
@@ -333,7 +368,6 @@ eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/
 //}
 
 
-
 function show_track (time1,time2) {
 
 	var unit_id =  chus_unit_id,
@@ -348,7 +382,7 @@ function show_track (time1,time2) {
      //to = Date.parse($('#fromtime2').val())/1000; // end of day in seconds
      //from = Date.parse($('#fromtime1').val())/1000; // get begin time - beginning of day
       to = sess.getServerTime(); // get current server time (end time of report time interval)
-	    from = to - 7200; // calculate start time of report
+	    from = to - 36000; // calculate start time of report
     }else{
     to = Date.parse(time2)/1000;
     from = Date.parse(time1)/1000;
@@ -524,11 +558,11 @@ $('#serch_bt').click(function() {
    }
 });
 
-
 const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 // Создаем экземпляр `SpeechRecognition`
-const recognizer = new speechRecognition();
+const recognizer = new speechRecognition()
  // Создаем распознаватель
+
 
  // Ставим опцию, чтобы распознавание началось ещё до того, как пользователь закончит говорить
  recognizer.interimResults = true;
