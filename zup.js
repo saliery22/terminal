@@ -1,4 +1,4 @@
-
+var TOKEN = '4d2e59443e9e64c89c5725f14c042fbd901A55F9167060545B703A13ABC2EB47E8B9BD59';
 
 // global variables
 var map, marker,unitslist = [],allunits = [],rest_units = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},unitsID = {},Vibranaya_zona;
@@ -707,5 +707,6 @@ let webkitListener = (e) => {
 
 
 }
+
 
 
