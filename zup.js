@@ -298,6 +298,7 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
       let name = data.items[i].$$user_name;
       let gr= '';
       let grup_id = data.items[i].$$user_units;
+		if(!grup_id)continue;
       grup_id.sort()
       for(let ii = 0; ii<grup_id.length; ii++){
         gr+=grup_id[ii]+',';
@@ -707,6 +708,7 @@ let webkitListener = (e) => {
 
 
 }
+
 
 
 
