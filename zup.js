@@ -6,10 +6,75 @@ var areUnitsLoaded = false;
 
 var rux=1;
 
+
 let RES_ID=601000448;// 601000284   "11_ККЗ"  601000448  "KKZ_Gluhiv"
 
 
 
+function online_upd() {
+unitslist.forEach(function(unit) {          
+    var unitMarker =  markerByUnit[unit.getId()];
+     if (unitMarker) {
+      if(unitMarker.options.opacity>0){
+        unitMarker.setOpacity(1);
+      var sdsa = unit.getPosition();
+     let pop = unitMarker.getPopup();
+       let fuel = '----';
+           let vodiy ='----';
+           let agregat ='----';
+          let sens = unit.getSensors(); // get unit's sensors
+          for (key in sens) {
+            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
+            }
+          
+            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
+              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+            }
+          
+            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
+              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
+            }
+          
+          }
+          
+          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
+            unitMarker.setOpacity(0.6);
+          } 
+         
+    if(sdsa)unitMarker.setLatLng([sdsa.y, sdsa.x]);
+
+    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          online_mark[unit.getId()] = markerstarton;
+                         }else{
+                           if(parseInt(sdsa.sc)<5){
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           online_mark[unit.getId()] = markerstarton;
+                           }else{
+                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             online_mark[unit.getId()] = markerstarton;
+                             }
+                         }
+                         }
+            }else{
+            if(parseInt(sdsa.s)>0){
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
+            online_mark[unit.getId()] = markerstarton;
+            }
+            }
+          }
+     }
+  });    
+}
 
 
 
@@ -29,38 +94,75 @@ function getUnitMarker(unit) {
   marker = L.marker([unitPos.y, unitPos.x], {
     clickable: true,
     draggable: true,
-    opacity: 0,
+    opacity: 1,
     icon: L.icon({
       iconUrl: unit.getIconUrl(),
-      zIndexOffset: -2000,
       iconSize:   [imsaze, imsaze],
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
- let fuel = '----';
- let vodiy ='----';
- let agregat ='----';
- let sped = unitPos.s;
+  marker.bindPopup('<center><font size="5">' + unit.getName());
+    if (marker) {
+      if(marker.options.opacity>0){
+        marker.setOpacity(1);
+      var sdsa = unit.getPosition();
+     let pop = marker.getPopup();
+       let fuel = '----';
+           let vodiy ='----';
+           let agregat ='----';
+          let sens = unit.getSensors(); // get unit's sensors
+          for (key in sens) {
+            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
+            }
+          
+            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
+              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+            }
+          
+            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
+              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
+            }
+          
+          }
+          
+          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
+            marker.setOpacity(0.6);
+          } 
+         
 
- let sens = unit.getSensors(); // get unit's sensors
- for (key in sens) {
-  if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
-    fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-    if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
-  }
+    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          online_mark[unit.getId()] = markerstarton;
+                         }else{
+                           if(parseInt(sdsa.sc)<5){
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           online_mark[unit.getId()] = markerstarton;
+                           }else{
+                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             online_mark[unit.getId()] = markerstarton;
+                             }
+                         }
+                         }
+            }else{
+            if(parseInt(sdsa.s)>0){
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
+            online_mark[unit.getId()] = markerstarton;
+            }
+            }
+          }
+     }
 
-  if (sens[key].n=='Водитель'||sens[key].n=='РФИД') {
-    vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-    if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
-  }
 
-  if (sens[key].n=='Прицеп') {
-    agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-    if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
-  }
-}
 
-  marker.bindPopup('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unitPos.t)+'<br />' +sped+' км/год<br />' +fuel+'л' +'<br /> водій ' +vodiy+'<br />прицеп ' +agregat);
   marker.on('click', function(e) {
   
     // select unit in UI
@@ -131,7 +233,8 @@ function init() { // Execute after login succeed
 }
 
 
-
+let online_mark = {};
+let event_data = {};
 
 // will be called after updateDataFlags success
 let geozonepoint = [];
@@ -145,7 +248,7 @@ let activ_zone=0;
 let marshrut_leyer_0;
 function initUIData() {
   var session = wialon.core.Session.getInstance();
-  var resource = wialon.core.Session.getInstance().getItem(601000284); 
+  var resource = wialon.core.Session.getInstance().getItem(601000284); //26227 - Gluhiv 20030 "11_ККЗ"
     let gzgroop = resource.getZonesGroups();
   resource.getZonesData(null, function(code, geofences) {
     var cord=[];
@@ -211,7 +314,6 @@ function initUIData() {
     var unitMarker = getUnitMarker(unit);
     if (unitMarker){
       unitMarker.addTo(map);
-      unitMarker.setZIndexOffset(-2000);
     } 
     
     // Add option
@@ -227,22 +329,11 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
       // move or create marker, if not exists
       if (pos) {
         if (unitMarker) {
-          unitMarker.setLatLng([pos.y, pos.x]);
-
-
-          let sped = unit.getPosition().s;
-
-          if (rux == 1 ){
-            if(sped>0 ){
-              unitMarker.setOpacity(1);
-              unitMarker.setZIndexOffset(-1000);
-            }else{
-              unitMarker.setOpacity(0.3);
-            }
-            
-          }
-    
-           let fuel = '----';
+      if(unitMarker.options.opacity>0){
+        unitMarker.setOpacity(1);
+      var sdsa = unit.getPosition();
+     let pop = unitMarker.getPopup();
+       let fuel = '----';
            let vodiy ='----';
            let agregat ='----';
           let sens = unit.getSensors(); // get unit's sensors
@@ -252,20 +343,50 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
               if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
             }
           
-            if (sens[key].n=='Водитель'||sens[key].n=='РФИД') {
+            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
             }
           
-            if (sens[key].n=='Прицеп') {
+            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
             }
-          }
-          let pop = unitMarker.getPopup();
-          pop.setContent('<center><font size="5">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(unit.getPosition().t)+'<br />' +sped+' км/год'+'<br />' +fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
           
-        } else {
+          }
+          
+          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
+            unitMarker.setOpacity(0.6);
+          } 
+         
+    if(sdsa)unitMarker.setLatLng([sdsa.y, sdsa.x]);
+   if(online_mark[unit.getId()]) map.removeLayer(online_mark[unit.getId()]);
+    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          online_mark[unit.getId()] = markerstarton;
+                         }else{
+                           if(parseInt(sdsa.sc)<5){
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           online_mark[unit.getId()] = markerstarton;
+                           }else{
+                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             online_mark[unit.getId()] = markerstarton;
+                             }
+                         }
+                         }
+            }else{
+            if(parseInt(sdsa.s)>0){
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
+            online_mark[unit.getId()] = markerstarton;
+            }
+            }
+          }
+     } else {
           // create new marker
           unitMarker = getUnitMarker(unit);
           
@@ -298,7 +419,7 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
       let name = data.items[i].$$user_name;
       let gr= '';
       let grup_id = data.items[i].$$user_units;
-		if(!grup_id)continue;
+      if(!grup_id)continue;
       grup_id.sort()
       for(let ii = 0; ii<grup_id.length; ii++){
         gr+=grup_id[ii]+',';
@@ -380,6 +501,7 @@ $(document).ready(function () {
 //}
 
 
+
 function show_track (time1,time2) {
 
 	var unit_id =  chus_unit_id,
@@ -394,7 +516,7 @@ function show_track (time1,time2) {
      //to = Date.parse($('#fromtime2').val())/1000; // end of day in seconds
      //from = Date.parse($('#fromtime1').val())/1000; // get begin time - beginning of day
       to = sess.getServerTime(); // get current server time (end time of report time interval)
-	    from = to - 36000; // calculate start time of report
+	    from = to - 7200; // calculate start time of report
     }else{
     to = Date.parse(time2)/1000;
     from = Date.parse(time1)/1000;
@@ -508,6 +630,8 @@ function clear(){
 
  $( "#grupi_avto" ).on( "change", function() {
   chuse(this.value);
+   for (const key in online_mark) {  map.removeLayer(online_mark[key])}
+        online_upd();
  });
 
 
@@ -523,13 +647,13 @@ for(var i=0; i < allunits.length; i++){
 idd =allunits[i].getId();
 mm = markerByUnit[idd];
  mm.setOpacity(0);
- mm.setZIndexOffset(-2000);
+ mm.setZIndexOffset(-900);
 
  if (str){
  str.forEach((element) => {
   if(idd==element){
     mm.setOpacity(1);
-    mm.setZIndexOffset(-1000);
+    mm.setZIndexOffset(1);
   }
 });
  continue;
@@ -570,11 +694,9 @@ $('#serch_bt').click(function() {
    }
 });
 
-const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-// Создаем экземпляр `SpeechRecognition`
-const recognizer = new speechRecognition()
- // Создаем распознаватель
 
+ // Создаем распознаватель
+ var recognizer = new webkitSpeechRecognition();
 
  // Ставим опцию, чтобы распознавание началось ещё до того, как пользователь закончит говорить
  recognizer.interimResults = true;
@@ -708,7 +830,4 @@ let webkitListener = (e) => {
 
 
 }
-
-
-
 
