@@ -24,19 +24,19 @@ unitslist.forEach(function(unit) {
            let agregat ='----';
           let sens = unit.getSensors(); // get unit's sensors
           for (key in sens) {
-            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+            if (sens[key].t=='fuel level') {
               fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
             }
           
-            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
+            if (sens[key].t=='driver') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+              if(vodiy == -348201.3876){vodiy = "----";}
             }
           
-            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
+            if (sens[key].t=='trailer') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
+              if(agregat == -348201.3876){agregat = "----";}
             }
           
           }
@@ -112,19 +112,19 @@ function getUnitMarker(unit) {
            let agregat ='----';
           let sens = unit.getSensors(); // get unit's sensors
           for (key in sens) {
-            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+            if (sens[key].t=='fuel level') {
               fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
             }
           
-            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
+            if (sens[key].t=='driver') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+              if(vodiy == -348201.3876){vodiy = "----";}
             }
           
-            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
+            if (sens[key].t=='trailer') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
+              if(agregat == -348201.3876){agregat = "----";}
             }
           
           }
