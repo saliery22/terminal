@@ -1,4 +1,4 @@
-var TOKEN = '4d2e59443e9e64c89c5725f14c042fbd57490C2BBF7EDF82855F2A104861D9E6A454BE30';
+var TOKEN = '4d2e59443e9e64c89c5725f14c042fbd901A55F9167060545B703A13ABC2EB47E8B9BD59';
 
 // global variables
 var map, marker,unitslist = [],allunits = [],rest_units = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},unitsID = {},Vibranaya_zona;
@@ -475,21 +475,46 @@ basemaps.OSM.addTo(map);
 //if(ps==55555){
 // execute when DOM ready
 $(document).ready(function () {
-  // init session
-  //wialon.core.Session.getInstance().initSession("https://local3.ingps.com.ua",null,0x800);
-  wialon.core.Session.getInstance().initSession("https://hst-api.wialon.com",null,0x800);
+ initApp();
+});
 
-  wialon.core.Session.getInstance().loginToken(TOKEN, "", // try to login
+function initApp(){
+  const TK = localStorage.getItem('wialon_token');
+  const USER = localStorage.getItem('wialon_user');
+  const host = "https://1.gpsagro.info";
+
+  if(TK){
+  wialon.core.Session.getInstance().initSession("https://hst-api.wialon.eu",null,0x800);
+  wialon.core.Session.getInstance().loginToken(TK, "", // try to login
     function (code) { // login callback
       // if error code - print error message
-      if (code){ msg(wialon.core.Errors.getErrorText(code)); return; }
-      msg('Зеднання з Глухів - успішно');
-    
+      if (code){
+         console.log(wialon.core.Errors.getErrorText(code)); 
+         console.log(code); 
+         msg('Звернітся до Пальгуй С.  ---- 0668196439');
+         if(code==1 || code==8)login(host);
+         return;
+         }
+      msg(USER+' успішне зеднання з Walon');
       initMap();
       init(); // when login suceed then run init() function
     }
   );
-});
+  }else{
+  login(host);
+  }
+}
+
+function login(host){
+  let currentPath = window.location.pathname;
+    if (!currentPath.endsWith('/')) {
+        currentPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+    }
+    let redirect = window.location.origin + currentPath + "post_token.html";
+    let encodedRedirect = encodeURIComponent(redirect);
+   let url = host+"/login.html?client_id=Palgui_S_MOBILE&access_type=-1&activation_time=0&duration=2592000&flags=0x1&redirect_uri=" + encodedRedirect;
+   window.location.href = url;   
+}
 
 
 //}else{
@@ -830,6 +855,4 @@ let webkitListener = (e) => {
 
 
 }
-
-
 
