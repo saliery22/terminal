@@ -479,6 +479,7 @@ $(document).ready(function () {
 });
 
 function initApp(){
+  initMap();
   const TK = localStorage.getItem('wialon_token');
   const USER = localStorage.getItem('wialon_user');
   const host = "https://1.gpsagro.info";
@@ -496,7 +497,6 @@ function initApp(){
          return;
          }
       msg(USER+' успішне зеднання з Walon');
-      initMap();
       init(); // when login suceed then run init() function
     }
   );
@@ -778,10 +778,23 @@ let y_pr=0;
 let x_pr=0;
 let geo_options = {
   enableHighAccuracy: true,
-  maximumAge: 30000,
+  maximumAge: 3000,
   timeout: 27000,
 };
 function success(position) {
+   lastUpdateTimestamp = Date.now();
+   const lastUpdate = new Date(position.timestamp).toLocaleTimeString();
+   const { latitude, longitude, accuracy, speed } = position.coords;
+   const speedKmH = speed ? (speed * 3.6).toFixed(1) : 0;
+const popupContent = `
+    <div style="text-align: center; font size="1";">
+        <b>Обновлено:</b> ${lastUpdate}<br />
+        <b>Координаты:</b> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br />
+        <b>Точность:</b> ±${Math.round(accuracy)} м<br />
+        <span style="color: blue;"><b>Скорость:</b> ${speedKmH} км/ч</span>
+    </div>
+`;
+
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
       rotationAngle: 0,
@@ -792,10 +805,14 @@ function success(position) {
         iconAnchor: [20, 20] // set icon center
       })
     }).addTo(map);
+    my_icon.bindPopup(popupContent);
+
     y_pr=position.coords.latitude;
     x_pr=position.coords.longitude;
   }else{
-    if(position.coords.accuracy<200){
+
+      my_icon.setPopupContent(popupContent);
+     
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
       let res = $("#lis0").val();
       for (let i = 0; i<unitslist.length; i++){
@@ -813,10 +830,16 @@ function success(position) {
           break;
        }
        }
-    }
+
     if(position.coords.accuracy<10){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
         L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
+        y_pr=position.coords.latitude;
+        x_pr=position.coords.longitude;
+      }
+    }else{
+          if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
+        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 0, 0)',weight:2,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
         x_pr=position.coords.longitude;
       }
@@ -826,10 +849,61 @@ function success(position) {
 
 }
 
-function error() {
+const error = (err) => {
+    let statusText = "";
 
+    switch(err.code) {
+        case err.PERMISSION_DENIED:
+            statusText = "Ошибка: Доступ к GPS запрещен пользователем.";
+            break;
+        case err.POSITION_UNAVAILABLE:
+            statusText = "Ошибка: Местоположение недоступно (нет сигнала).";
+            break;
+        case err.TIMEOUT:
+            statusText = "Ошибка: Время ожидания GPS истекло. Ищу спутники...";
+            break;
+        default:
+            statusText = "Произошла неизвестная ошибка при поиске.";
+            break;
+    }
+
+
+    // Выводим ошибку прямо в Popup нашего маркера
+         if (my_icon) {
+      my_icon.setPopupContent( `<div style=" text-align: center; font size="1"">
+            <b>Внимание!</b><br />
+            ${statusText}
+        </div>`);
+     }
+
+    
+};
+
+
+
+let lastUpdateTimestamp = Date.now();
+let watchID = null;
+
+function startWatching() {
+    // Если уже запущено — сначала останавливаем
+    if (watchID !== null) {
+        navigator.geolocation.clearWatch(watchID);
+    }
+
+    watchID = navigator.geolocation.watchPosition(success, error, geo_options);
 }
-let watchID = navigator.geolocation.watchPosition(success, error, geo_options);
+
+setInterval(() => {
+    const timeSinceLastUpdate = Date.now() - lastUpdateTimestamp;
+    // Если данных нет дольше 45 секунд (учитывая ваш timeout 27с + запас)
+    if (timeSinceLastUpdate > 45000) {
+        startWatching(); 
+    }
+}, 10000);
+
+// Первый запуск
+startWatching();
+
 
 
 if(window.DeviceOrientationEvent) {
@@ -855,5 +929,4 @@ let webkitListener = (e) => {
 
 
 }
-
 
