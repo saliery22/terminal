@@ -778,7 +778,7 @@ let y_pr=0;
 let x_pr=0;
 let geo_options = {
   enableHighAccuracy: true,
-  maximumAge: 3000,
+  maximumAge: 0,
   timeout: 27000,
 };
 function success(position) {
