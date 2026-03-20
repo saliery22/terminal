@@ -865,6 +865,10 @@ function updatePopupContent() {
     </div>
     `;
 
-    // Обновляем текст в открытом попапе, если он привязан
-    my_icon.getPopup().setContent(content);
+    if (my_icon.getPopup()) {
+        my_icon.getPopup().setContent(content);
+    } else {
+        // Если попапа нет — создаем и привязываем его
+        my_icon.bindPopup(content);
+    }
 }
