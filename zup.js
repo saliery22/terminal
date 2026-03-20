@@ -1,7 +1,7 @@
 
 
 // global variables
-var map, marker,allunits = [], markerByUnit = {},tile_layer, layers = {};
+var map =null, marker,allunits = [], markerByUnit = {},tile_layer, layers = {};
 
 var rux=1;
 
@@ -35,7 +35,6 @@ allunits.forEach(function(unit) {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(agregat == -348201.3876){agregat = "----";}
             }
-          
           }
           
           pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
@@ -93,8 +92,8 @@ function getUnitMarker(unit) {
     draggable: true,
     opacity: 1,
     icon: L.icon({
-      iconUrl: unit.getIconUrl(),
-      iconSize:   [imsaze, imsaze],
+      iconUrl: unit.getIconUrl(imsaze),
+      iconSize: [imsaze, null],
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
@@ -262,8 +261,7 @@ $('#grupi_avto').empty();
 
   var units = session.getItems('avl_unit');
   units.forEach(function(unit) {  
-
-     unit.removeAllListeners();       
+     
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
       unit.addListener('lastMessage', function(event) {
@@ -388,7 +386,9 @@ function initMap() {
   map = L.map('map', {
     // disable zooming, because we will use double-click to set up marker
     doubleClickZoom: true,
-    animate: false
+    animate: false,
+    zoomControl: false ,
+    attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
   
  //L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{ subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
@@ -409,6 +409,9 @@ layerControl=L.control.layers(basemaps).addTo(map);
 
 basemaps.OSM.addTo(map);
 
+L.control.zoom({
+    position: 'bottomright' // Ставим в правый нижний угол
+}).addTo(map);
 
 }
 
@@ -528,7 +531,7 @@ function show_track (time1,time2) {
 		"timeTo": to, // interval end
 		"tripDetector": 0, //use trip detector: 0 - no, 1 - yes
 		"trackColor": color, //track color in ARGB format (A - alpha channel or transparency level)
-		"trackWidth": 2, // track line width in pixels
+		"trackWidth": 4, // track line width in pixels
 		"arrows": 1, //show course of movement arrows: 0 - no, 1 - yes
 		"points": 0, // show points at places where messages were received: 0 - no, 1 - yes
 		"pointColor": color, // points color
@@ -543,7 +546,6 @@ function show_track (time1,time2) {
 function clear(){  
  if(tile_layer) {map.removeLayer(tile_layer); tile_layer=null; layers[0]=0; }
 }
-
 
 
  $( "#grupi_avto" ).on( "change", function() {
@@ -688,8 +690,8 @@ const popupContent = `
       icon: L.icon({
         zIndexOffset: 1000,
         iconUrl: '111.png',
-        iconSize:   [40, 40],
-        iconAnchor: [20, 20] // set icon center
+        iconSize:   [48, 48],
+        iconAnchor: [24, 24] // set icon center
       })
     }).addTo(map);
     my_icon.bindPopup(popupContent);
@@ -720,7 +722,7 @@ const popupContent = `
 
     if(position.coords.accuracy<30){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
-        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
+        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:4,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
         x_pr=position.coords.longitude;
       }
