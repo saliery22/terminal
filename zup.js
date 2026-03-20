@@ -354,8 +354,9 @@ $('#grupi_avto').empty();
          select.append(newOption);
       }
     }
+     select.value = "11_ККЗ Загальна";
     });
- 
+
     
 }
 
