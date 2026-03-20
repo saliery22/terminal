@@ -306,6 +306,9 @@ $('#grupi_avto').empty();
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
       unit.addListener('changeLastMessage', function(event) {
+
+        if (map.dragging.moving()) return;
+        
       var pos = event.getData();
       if (pos) {
         unitMarker.LT = pos.t; 
@@ -440,6 +443,7 @@ function initMap() {
     doubleClickZoom: true,
     fadeAnimation: false, // отключаем плавное появление слоев
     animate: false,
+    inertia: false,  
     zoomControl: false ,
     fadeAnimation: false,
     //markerZoomAnimation: false,
