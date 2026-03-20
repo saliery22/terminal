@@ -447,7 +447,7 @@ function initMap() {
     zoomControl: false ,
     fadeAnimation: false,
     zoomSnap: 0.1,
-    markerZoomAnimation: false,
+    //markerZoomAnimation: false,
     updateWhenIdle: true,
     updateWhenZooming: false,
     bounceAtZoomLimits: false,
