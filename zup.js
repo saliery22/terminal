@@ -151,22 +151,22 @@ function getUnitMarker(unit) {
 
     if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
                          if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                           online_mark[unit.getId()] = markerstarton;
                          }else{
                            if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                            online_mark[unit.getId()] = markerstarton;
                            }else{
                              if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                              online_mark[unit.getId()] = markerstarton;
                              }
                          }
                          }
             }else{
             if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
              markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
             online_mark[unit.getId()] = markerstarton;
             }
@@ -278,7 +278,7 @@ if (geozones.length === 0) {
             }
            }
            var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
-           var geozona =  L.polygon([cord], {color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
+           var geozona =  L.polygon(cord, {pane: 'heavyMarkers',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
            geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
            geozones.push(geozona);   
       }
@@ -354,24 +354,24 @@ $('#grupi_avto').empty();
          
     if(sdsa)unitMarker.setLatLng([sdsa.y, sdsa.x]);
    if(online_mark[unit.getId()]) map.removeLayer(online_mark[unit.getId()]);
-    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
+       if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
                          if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                           online_mark[unit.getId()] = markerstarton;
                          }else{
                            if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                            online_mark[unit.getId()] = markerstarton;
                            }else{
                              if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                              online_mark[unit.getId()] = markerstarton;
                              }
                          }
                          }
             }else{
             if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
              markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
             online_mark[unit.getId()] = markerstarton;
             }
@@ -422,10 +422,10 @@ $('#grupi_avto').empty();
             if((Date.now())/1000-parseInt(marker.LT)>3600){
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
-                          let markerstarton = L.marker(marker.getLatLng(),{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                           online_mark[unitId] = markerstarton;
                          }else{
-                            let markerstarton = L.marker(marker.getLatLng(),{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
                              online_mark[unitId] = markerstarton;
                          }
             }
@@ -454,17 +454,19 @@ function initMap() {
     preferCanvas: true,
     attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
+
+  map.createPane('heavyMarkers');
+// Устанавливаем ему z-index, чтобы он был над картой, но под важными элементами
+map.getPane('heavyMarkers').style.zIndex = 600; 
   
  // Скрываем маркеры, когда начался зум пальцами
 map.on('zoomstart', function() {
-    var pane = map.getPane('markerPane');
-    if (pane) pane.style.display = 'none'; 
+    map.getPane('heavyMarkers').style.display = 'none';
 });
 
 // Возвращаем иконки только после того, как зум полностью завершился
 map.on('zoomend', function() {
-    var pane = map.getPane('markerPane');
-    if (pane) pane.style.display = 'block';
+     map.getPane('heavyMarkers').style.display = 'block';
 });
 
 
