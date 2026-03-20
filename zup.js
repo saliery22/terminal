@@ -455,10 +455,17 @@ function initMap() {
     attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
   
- //L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{ subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
+ // Скрываем маркеры, когда начался зум пальцами
+map.on('zoomstart', function() {
+    var pane = map.getPane('markerPane');
+    if (pane) pane.style.display = 'none'; 
+});
 
-
-  // add an OpenStreetMap tile layer
+// Возвращаем иконки только после того, как зум полностью завершился
+map.on('zoomend', function() {
+    var pane = map.getPane('markerPane');
+    if (pane) pane.style.display = 'block';
+});
 
 
   var basemaps = {
