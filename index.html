@@ -31,7 +31,6 @@ body {
 
 
 
-#log { float: left; width: 100%; border: 1px solid #c6c6c6; max-height:50px; overflow-y: auto; margin: 0px 0px 10px 0px;}
 
 
 select { 
@@ -39,25 +38,41 @@ select {
     font-size: 24px;
 }
 
-span { background:  #F0F0F0;
-    font-size: 30px;
+
+.leaflet-control-layers-toggle {
+    width: 150px !important;  /* Жесткая ширина */
+    height: 150px !important; /* Жесткая высота */
+    background-size: 100px 100px !important; /* Увеличиваем саму иконку внутри */
+    background-position: center !important;   /* Центрируем иконку */
 }
 
-.leaflet-control-layers-toggle{
-     min-width:100px;
-    min-height:100px;
-    }
+/* Если нужно, чтобы само меню (когда навел мышкой) тоже было крупным */
+.leaflet-control-layers-expanded {
+    font-size: 24px !important; /* Увеличиваем текст в списке слоев */
+    padding: 20px !important;
+}
 
-input[type="radio"]{
-    width: 26px;
-  height: 26px;
-    }
-input[type="checkbox"]{
-    width: 26px;
-  height: 26px;
-    }
+/* Увеличиваем чекбоксы внутри меню */
+.leaflet-control-layers-selector {
+    transform: scale(2); /* Делаем галочки в 2 раза больше */
+    margin-right: 15px !important;
+}
 
-    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+/* Увеличиваем весь контейнер кнопок */
+.leaflet-control-zoom.leaflet-bar {
+    border: 2px solid #ccc !important;
+}
+
+/* Стили для самих кнопок + и - */
+.leaflet-control-zoom-in, 
+.leaflet-control-zoom-out {
+    width: 60px !important;    /* Стандартно ~30px, увеличили до 60 */
+    height: 60px !important;   /* Стандартно ~30px, увеличили до 60 */
+    line-height: 60px !important; /* Центрируем символ по вертикали */
+    font-size: 32px !important;   /* Увеличиваем размер самого плюса и минуса */
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
     background: rgba(255, 255, 255, 0.7) !important; /* 0.7 — уровень прозрачности */
     box-shadow: 0 3px 14px rgba(0,0,0,0.2);
 }
