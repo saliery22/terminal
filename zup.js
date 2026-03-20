@@ -187,7 +187,7 @@ function init() { // Execute after login succeed
   // get instance of current Session
   var session = wialon.core.Session.getInstance();
   // specify what kind of data should be returned
-  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition | wialon.item.Unit.dataFlag.sensors | wialon.item.Unit.dataFlag.lastMessage;
+  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition | wialon.item.Unit.dataFlag.pos | wialon.item.Unit.dataFlag.sensors | wialon.item.Unit.dataFlag.lastMessage;
   var res_flags = wialon.item.Item.dataFlag.base | wialon.item.Resource.dataFlag.zones| wialon.item.Resource.dataFlag.zoneGroups;
  
 	var remote= wialon.core.Remote.getInstance();
@@ -228,6 +228,11 @@ if (geozones.length === 0) {
         cord=[];
          var zone = geofences[i];
          if(zone.n[2]=='к' || zone.n[3]=='к') continue;
+            if (zone.p && zone.p.length) {
+                for (let j = 0; j < zone.p.length; j++) {
+                    cord.push([zone.p[j].y, zone.p[j].x]); // Wialon y=lat, x=lon
+                }
+            } else { continue; }
          var zonegr="";
            for (var key in gzgroop) {
             if(gzgroop[key].n[0]!='*' && gzgroop[key].n[0]!='#'){
@@ -238,7 +243,7 @@ if (geozones.length === 0) {
            }
            var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
            var geozona =  L.polygon([cord], {color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
-           geozona.bindTooltip(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
+           geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
            geozones.push(geozona);   
       }
       let lgeozone = L.layerGroup(geozones);
@@ -264,7 +269,7 @@ $('#grupi_avto').empty();
      
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
-      unit.addListener('lastMessage', function(event) {
+      unit.addListener('changeLastMessage', function(event) {
       var pos = event.getData();
       if (pos) {
         unitMarker.LT = pos.t; 
@@ -332,6 +337,8 @@ $('#grupi_avto').empty();
 
 
 
+
+
  
   session.searchItems({itemsType: "avl_unit_group", propName: "", propValueMask: "", sortType: "sys_name"},true, 1, 0, 0, function(code, data) {
     if (code) {
@@ -387,8 +394,10 @@ function initMap() {
   map = L.map('map', {
     // disable zooming, because we will use double-click to set up marker
     doubleClickZoom: true,
+    fadeAnimation: false, // отключаем плавное появление слоев
     animate: false,
     zoomControl: false ,
+    preferCanvas: true,
     attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
   
