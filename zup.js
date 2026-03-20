@@ -1,18 +1,15 @@
 
 
 // global variables
-var map, marker,unitslist = [],allunits = [],rest_units = [], unitMarkers = [], markerByUnit = {},tile_layer, layers = {},unitsID = {},Vibranaya_zona;
-var areUnitsLoaded = false;
+var map, marker,allunits = [], markerByUnit = {},tile_layer, layers = {};
 
 var rux=1;
-
 
 let RES_ID=601000448;// 601000284   "11_ККЗ"  601000448  "KKZ_Gluhiv"
 
 
-
 function online_upd() {
-unitslist.forEach(function(unit) {          
+allunits.forEach(function(unit) {          
     var unitMarker =  markerByUnit[unit.getId()];
      if (unitMarker) {
       if(unitMarker.options.opacity>0){
@@ -159,19 +156,12 @@ function getUnitMarker(unit) {
             }
             }
           }
+          marker.addTo(map);
      }
 
 
 
   marker.on('click', function(e) {
-  
-    // select unit in UI
-    $('#units').val(unit.getId());
-      
-     var pos = e.latlng;
-      
-    // map.setView([pos.lat, pos.lng],14);
-      
      var unitId = unit.getId();
      $("#lis0").val(unit.getName());
      chus_unit_id = unitId;
@@ -184,14 +174,12 @@ function getUnitMarker(unit) {
  
   markerByUnit[unit.getId()] = marker;
   allunits.push(unit);
-  unitsID[unit.getName()] = unit.getId();
   return marker;
 }
 
 
 
-// Print message to log
-function msg(text) { $('#log').prepend(text + '<br/>'); }
+
 
 
 
@@ -217,15 +205,9 @@ function init() { // Execute after login succeed
   session.updateDataFlags( // load items to current session
 		[{type: 'type', data: 'avl_resource', flags:res_flags , mode: 0}, // 'avl_resource's specification
 		 {type: 'type', data: 'avl_unit', flags: flags, mode: 0}], // 'avl_unit's specification
-	function (error) { // updateDataFlags callback     
-        
+	function (error) { // updateDataFlags callback       
       if (error) {
-        // show error, if update data flags was failed
-        msg(wialon.core.Errors.getErrorText(error));
       } else {
-        areUnitsLoaded = true;
-        msg('Техніка завнтажена - успішно');
-        // add received data to the UI, setup UI events
         initUIData();
       }
     }
@@ -234,24 +216,15 @@ function init() { // Execute after login succeed
 
 
 let online_mark = {};
-let event_data = {};
-
-// will be called after updateDataFlags success
-let geozonepoint = [];
-let geozonepointTurf = [];
 let geozones = [];
-let geozonesgrup = [];
 let unitsgrup = {};
-let IDzonacord=[];
-let lgeozoneee;
-let activ_zone=0;
-let marshrut_leyer_0;
 function initUIData() {
-  var session = wialon.core.Session.getInstance();
+var session = wialon.core.Session.getInstance();
+
+if (geozones.length === 0) { 
   var resource = wialon.core.Session.getInstance().getItem(601000284); //26227 - Gluhiv 20030 "11_ККЗ"
-    let gzgroop = resource.getZonesGroups();
+  let gzgroop = resource.getZonesGroups();
   resource.getZonesData(null, function(code, geofences) {
-    var cord=[];
       for (let i = 0; i < geofences.length; i++) {
         cord=[];
          var zone = geofences[i];
@@ -264,71 +237,39 @@ function initUIData() {
            });
             }
            }
-         var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
-           for (let ii = 0; ii < zone.p.length; ii++) {
-            cord.push([zone.p[ii].y , zone.p[ii].x]);
-
-           }
-           IDzonacord[zone.id]=cord;
-           
+           var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
            var geozona =  L.polygon([cord], {color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
-          // geozona.bindPopup(zone.n);
            geozona.bindTooltip(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
-           geozona.zone = zone;
            geozones.push(geozona);   
-
-           geozona.on('click', function(e) {
-          
-           
-           
-           
-           geozonepoint.length =0;
-           geozonepointTurf.length =0;
-           Vibranaya_zona = this.zone;
-           clearGEO();
-    
-
-        
-          });
-
       }
-  
       let lgeozone = L.layerGroup(geozones);
       layerControl.addOverlay(lgeozone, "Геозони");
-   
-
-
-    
-
-
-
   });
+}
 
 
-  
+$('#grupi_avto').empty();
+ for (let id in online_mark) {
+      if (online_mark[id]) map.removeLayer(online_mark[id]);
+  }
+  online_mark = {};
+  for (var id in markerByUnit) {
+      if (markerByUnit[id]) map.removeLayer(markerByUnit[id]);
+  }
+  markerByUnit = {};
+  allunits = [];
 
 
   var units = session.getItems('avl_unit');
+  units.forEach(function(unit) {  
 
-  units.forEach(function(unit) {          
+     unit.removeAllListeners();       
     var unitMarker = getUnitMarker(unit);
-    if (unitMarker){
-      unitMarker.addTo(map);
-    } 
-    
-    // Add option
-$('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
-
-
-    // listen for new messages
-    unit.addListener('changePosition', function(event) {
-      // event is qx.event.type.Data
-      // extract message data
+     if (unitMarker) {
+      unit.addListener('lastMessage', function(event) {
       var pos = event.getData();
-      
-      // move or create marker, if not exists
       if (pos) {
-        if (unitMarker) {
+        unitMarker.LT = pos.t; 
       if(unitMarker.options.opacity>0){
         unitMarker.setOpacity(1);
       var sdsa = unit.getPosition();
@@ -386,32 +327,16 @@ $('#lis0').append($('<option>').text(unit.getName()).val(unit.getId()));
             }
             }
           }
-     } else {
-          // create new marker
-          unitMarker = getUnitMarker(unit);
-          
-          // add marker to the map
-          if (unitMarker) unitMarker.addTo(map);
-          else msg('Got message with pos, but unit don\'t have a position');
-        }
       }
     });
-  
-  
-
-var sdsa = unit.getPosition();
-if (sdsa){
-    unitslist.push(unit);
-    unitMarkers.push(unitMarker) ;  
-if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.push(unit.getName());}
-}
-
+  }
   });
+
+
 
  
   session.searchItems({itemsType: "avl_unit_group", propName: "", propValueMask: "", sortType: "sys_name"},true, 1, 0, 0, function(code, data) {
     if (code) {
-        msg(wialon.core.Errors.getErrorText(code));
         return;
     }
     let select = document.getElementById('grupi_avto');
@@ -436,13 +361,29 @@ if (Date.parse($('#fromtime1').val())/1000 > unit.getPosition().t){rest_units.pu
     
 }
 
-
+  setInterval(function() {
+  if (typeof markerByUnit === 'undefined' || !markerByUnit) return;
+  for (let unitId in markerByUnit) {
+     let marker = markerByUnit[unitId];
+       if (!marker || !marker.LT) continue;
+            if((Date.now())/1000-parseInt(marker.LT)>3600){
+               if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
+                         if((Date.now())/1000-parseInt(marker.LT)>21600){
+                          let markerstarton = L.marker(marker.getLatLng(),{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          online_mark[unitId] = markerstarton;
+                         }else{
+                            let markerstarton = L.marker(marker.getLatLng(),{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             online_mark[unitId] = markerstarton;
+                         }
+            }
+  }
+  }, 60000); 
 
 
 
 var layerControl=0;
 function initMap() {
-  
+  if (map !== null) return;
   // create a map in the "map" div, set the view to a given place and zoom
   map = L.map('map', {
     // disable zooming, because we will use double-click to set up marker
@@ -471,9 +412,17 @@ basemaps.OSM.addTo(map);
 
 }
 
-//let ps = prompt('');
-//if(ps==55555){
-// execute when DOM ready
+document.addEventListener("visibilitychange", function() {
+    if (!document.hidden) {
+        // Проверяем, авторизованы ли мы еще в Wialon
+        var session = wialon.core.Session.getInstance();
+        if (!session || !session.getCurrUser()) {
+            console.log("Сессия потеряна, переподключаемся...");
+            initApp(); 
+        }
+    }
+});
+
 $(document).ready(function () {
  initApp();
 });
@@ -492,11 +441,9 @@ function initApp(){
       if (code){
          console.log(wialon.core.Errors.getErrorText(code)); 
          console.log(code); 
-         msg('Звернітся до Пальгуй С.  ---- 0668196439');
          if(code==1 || code==8)login(host);
          return;
          }
-      msg(USER+' успішне зеднання з Walon');
       init(); // when login suceed then run init() function
     }
   );
@@ -517,14 +464,6 @@ function login(host){
 }
 
 
-//}else{
-//  $('#marrr').hide();
-//  $('#option').hide();
-//  $('#unit_info').hide();
-//  $('#zupinki').hide();
-//  $('#map').hide();
-//}
-
 
 
 function show_track (time1,time2) {
@@ -541,26 +480,18 @@ function show_track (time1,time2) {
      //to = Date.parse($('#fromtime2').val())/1000; // end of day in seconds
      //from = Date.parse($('#fromtime1').val())/1000; // get begin time - beginning of day
       to = sess.getServerTime(); // get current server time (end time of report time interval)
-	    from = to - 7200; // calculate start time of report
+	    let date = new Date(to * 1000); // переводим в миллисекунды для Date
+      date.setHours(0, 0, 0, 0); 
+      from = Math.floor(date.getTime() / 1000); // получаем начало дня в секундах
     }else{
     to = Date.parse(time2)/1000;
     from = Date.parse(time1)/1000;
     }
-         
-
 		if (!unit) return; // exit if no unit
-
-    
-    
-    
           	if (layers[0]==0)
 	{
 		// delete layer from renderer
 		renderer.removeAllLayers(function(code) { 
-			if (code) 
-				msg(wialon.core.Errors.getErrorText(code)); // exit if error code
-			else 
-				msg("Track removed."); // else send message, then ok
 		});
     layers[0]=1;
 	}
@@ -574,48 +505,19 @@ function show_track (time1,time2) {
     layers[0]+=1;
     if(layers[0]>4) layers[0]=1;
    
-   
-    
-    
-    
-      
 		var pos = unit.getPosition(); // get unit position
 		if(!pos) return; // exit if no position
 
-    
-  
-
-    
-    
-		// callback is performed, when messages are ready and layer is formed
 		callback =  qx.lang.Function.bind(function(code, layer) {
-			if (code) { msg(wialon.core.Errors.getErrorText(code)); return; } // exit if error code
+			if (code) { return; } // exit if error code
 			
 			if (layer) { 
-           
-				//var layer_bounds = layer.getBounds(); // fetch layer bounds
-				//if (!layer_bounds || layer_bounds.length != 4 || (!layer_bounds[0] && !layer_bounds[1] && !layer_bounds[2] && !layer_bounds[3])) // check all bounds terms
-				  //  return;
-				
-				// if map existence, then add tile-layer and marker on it
 				if (map) {
-                   
-				   //prepare bounds object for map
-				   // var bounds = new L.LatLngBounds(
-					//L.latLng(layer_bounds[0],layer_bounds[1]),
-					//L.latLng(layer_bounds[2],layer_bounds[3])
-				   // );
-				   // map.fitBounds(bounds); // get center and zoom
-				    // create tile-layer and specify the tile template
 					if (!tile_layer)
 						tile_layer = L.tileLayer(sess.getBaseUrl() + "/adfurl" + renderer.getVersion() + "/avl_render/{x}_{y}_{z}/"+ sess.getId() +".png", {zoomReverse: true, zoomOffset: -1,zIndex: 3}).addTo(map);
 					else 
 						tile_layer.setUrl(sess.getBaseUrl() + "/adfurl" + renderer.getVersion() + "/avl_render/{x}_{y}_{z}/"+ sess.getId() +".png");
-				    // push this layer in global container
-				   
-				   
-				}
-				
+				}	
 			}
 	});
 	// query params
@@ -639,18 +541,9 @@ function show_track (time1,time2) {
 
  
 function clear(){  
- 
  if(tile_layer) {map.removeLayer(tile_layer); tile_layer=null; layers[0]=0; }
 }
 
-
- function clearGEO(){  
-   for(var i=0; i < geo_layer.length; i++){
-  map.removeLayer(geo_layer[i]);
-   if(i == geo_layer.length-1){geo_layer=[];}
-  }
-
- }
 
 
  $( "#grupi_avto" ).on( "change", function() {
@@ -689,25 +582,17 @@ mm = markerByUnit[idd];
 }
 
 
-function Clrar_no_activ(){
-for(var i=0; i < allunits.length; i++){
- if (Date.parse($('#fromtime2').val())/1000-432000> allunits[i].getPosition().t ){
- let mm = markerByUnit[allunits[i].getId()];
- mm.setOpacity(0);
- }
-}
-}
 
 
 $('#serch_bt').click(function() { 
   let res = $("#lis0").val();
-  for (let i = 0; i<unitslist.length; i++){
+  for (let i = 0; i<allunits.length; i++){
     if(res=='')break;
-    let nm=unitslist[i].getName();
-    let id=unitslist[i].getId();
+    let nm=allunits[i].getName();
+    let id=allunits[i].getId();
    if(nm.indexOf(res)>=0){
-    let y=unitslist[i].getPosition().y;
-    let x=unitslist[i].getPosition().x;
+    let y=allunits[i].getPosition().y;
+    let x=allunits[i].getPosition().x;
     map.setView([y,x]);
     $("#lis0").val(nm);
     chus_unit_id = id;
@@ -736,12 +621,12 @@ $('#serch_bt').click(function() {
     let res0 = result[0].transcript.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9]/g, '');
     let res = res0.charAt(0).toUpperCase() + res0.slice(1)
     $("#lis0").val(res);
-    for (let i = 0; i<unitslist.length; i++){
-      let nm=unitslist[i].getName();
-      let id=unitslist[i].getId();
+    for (let i = 0; i<allunits.length; i++){
+      let nm=allunits[i].getName();
+      let id=allunits[i].getId();
      if(nm.indexOf(res)>=0){
-      let y=unitslist[i].getPosition().y;
-      let x=unitslist[i].getPosition().x;
+      let y=allunits[i].getPosition().y;
+      let x=allunits[i].getPosition().x;
       map.setView([y,x]);
       $("#lis0").val(nm);
       chus_unit_id = id;
@@ -769,6 +654,7 @@ $('#speech_me_bt').click(function() {
   if (my_icon){
      map.closePopup();
      map.setView(my_icon.getLatLng());
+     my_icon.openPopup();
     }
 });
 
@@ -815,12 +701,12 @@ const popupContent = `
      
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
       let res = $("#lis0").val();
-      for (let i = 0; i<unitslist.length; i++){
+      for (let i = 0; i<allunits.length; i++){
         if(res=='')break;
-        let nm=unitslist[i].getName();
+        let nm=allunits[i].getName();
        if(nm.indexOf(res)>=0){
-        let y=unitslist[i].getPosition().y;
-        let x=unitslist[i].getPosition().x;
+        let y=allunits[i].getPosition().y;
+        let x=allunits[i].getPosition().x;
         if (!my_line){
           my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:2,opacity:1}).addTo(map);
         }else{
@@ -831,7 +717,7 @@ const popupContent = `
        }
        }
 
-    if(position.coords.accuracy<10){
+    if(position.coords.accuracy<30){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
         L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
