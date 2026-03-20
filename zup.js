@@ -654,6 +654,7 @@ $('#speech_me_bt').click(function() {
   if (my_icon){
      map.closePopup();
      map.setView(my_icon.getLatLng());
+     my_icon.setZIndexOffset(10000);
      my_icon.openPopup();
     }
 });
