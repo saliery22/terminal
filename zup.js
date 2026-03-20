@@ -670,19 +670,18 @@ let geo_options = {
   maximumAge: 0,
   timeout: 27000,
 };
+
+
+let speedKmH;
+let lastUpdate;
+let accuracy;
+
 function success(position) {
    lastUpdateTimestamp = Date.now();
-   const lastUpdate = new Date(position.timestamp).toLocaleTimeString();
-   const { latitude, longitude, accuracy, speed } = position.coords;
-   const speedKmH = speed ? (speed * 3.6).toFixed(1) : 0;
-const popupContent = `
-    <div style="text-align: center; font size="1";">
-        <b>Обновлено:</b> ${lastUpdate}<br />
-        <b>Координаты:</b> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br />
-        <b>Точность:</b> ±${Math.round(accuracy)} м<br />
-        <span style="color: blue;"><b>Скорость:</b> ${speedKmH} км/ч</span>
-    </div>
-`;
+   lastUpdate = new Date(position.timestamp).toLocaleTimeString();
+   speedKmH = position.coords.speed ? (position.coords.speed * 3.6).toFixed(1) : 0;
+   accuracy = Math.round(position.coords.accuracy);
+
 
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
@@ -694,13 +693,13 @@ const popupContent = `
         iconAnchor: [24, 24] // set icon center
       })
     }).addTo(map);
-    my_icon.bindPopup(popupContent);
+    updatePopupContent();
 
     y_pr=position.coords.latitude;
     x_pr=position.coords.longitude;
   }else{
 
-      my_icon.setPopupContent(popupContent);
+      updatePopupContent();
      
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
       let res = $("#lis0").val();
@@ -794,20 +793,44 @@ setInterval(() => {
 startWatching();
 
 
-
+let currentCompassHeading = 0;
+let lastPopupAngle = 0; 
+const ANGLE_THRESHOLD = 15; 
 if(window.DeviceOrientationEvent) {
   let absoluteListener = (e) => {
     if (!e.absolute || e.alpha == null || e.beta == null || e.gamma == null)
         return;
     let compass = -(e.alpha + e.beta * e.gamma / 90);
     compass -= Math.floor(compass / 360) * 360; // Wrap into range [0,360].
-    if (my_icon){ my_icon.setRotationAngle(compass);}
+    currentCompassHeading = compass;
+    if (my_icon){
+        if (my_icon.isPopupOpen()) {
+            let diff = Math.abs(compass - lastPopupAngle);
+            if (diff > 180) diff = 360 - diff; 
+            if (diff >= ANGLE_THRESHOLD) {
+                updatePopupContent(); // Ваша функция обновления текста
+                lastPopupAngle = compass; // Запоминаем новый угол
+            }
+        }
+       my_icon.setRotationAngle(compass);
+      }
     window.removeEventListener("deviceorientation", webkitListener);
 };
 let webkitListener = (e) => {
     let compass = e.webkitCompassHeading;
     if (compass!=null && !isNaN(compass)) {
-      if (my_icon){ my_icon.setRotationAngle(compass);}
+      currentCompassHeading = compass;
+      if (my_icon){
+        if (my_icon.isPopupOpen()) {
+            let diff = Math.abs(compass - lastPopupAngle);
+            if (diff > 180) diff = 360 - diff; 
+            if (diff >= ANGLE_THRESHOLD) {
+                updatePopupContent(); // Ваша функция обновления текста
+                lastPopupAngle = compass; // Запоминаем новый угол
+            }
+        }
+         my_icon.setRotationAngle(compass);
+        }
         window.removeEventListener("deviceorientationabsolute", absoluteListener);
     }
 }
@@ -819,3 +842,28 @@ let webkitListener = (e) => {
 
 }
 
+function getDirection(course) {
+    if (course === undefined || course === null) return "неизвестно";
+    const directions = ['Север', 'Сев-Вост', 'Восток', 'Юго-Вост', 'Юг', 'Юго-Зап', 'Запад', 'Сев-Зап', 'Север'];
+    // Делим 360 градусов на 8 секторов по 45 градусов
+    return directions[Math.round(course / 45) % 8];
+}
+
+
+function updatePopupContent() {
+    if (!my_icon) return;
+
+    // Берем направление из нашей переменной компаса
+    const directionText = getDirection(currentCompassHeading); 
+    const content = `
+    <div style="text-align: center; font size="1";">
+        <b>Обновлено:</b> ${lastUpdate}<br />
+        <b>Направление:</b> ${directionText} (${Math.round(currentCompassHeading)}°)<br />
+        <b>Точность:</b> ±${accuracy} м<br />
+        <span style="color: blue;"><b>Скорость:</b> ${speedKmH} км/ч</span>
+    </div>
+    `;
+
+    // Обновляем текст в открытом попапе, если он привязан
+    my_icon.getPopup().setContent(content);
+}
