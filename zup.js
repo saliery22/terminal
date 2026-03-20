@@ -20,7 +20,7 @@ allunits.forEach(function(unit) {
            let vodiy ='----';
            let agregat ='----';
           let sens = unit.getSensors(); // get unit's sensors
-          for (key in sens) {
+       for (key in sens) {
             if (sens[key].t=='fuel level') {
               fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
@@ -28,13 +28,22 @@ allunits.forEach(function(unit) {
           
             if (sens[key].t=='driver') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";}
+              if(vodiy == -348201.3876){vodiy = "----";}else{
+                if(vodiy){
+                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
+                    }
             }
+          }
           
             if (sens[key].t=='trailer') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";}
+              if(agregat == -348201.3876){agregat = "----";}else{
+                if(agregat){
+                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
+                    }
             }
+          }
+          
           }
           
           pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
@@ -115,13 +124,21 @@ function getUnitMarker(unit) {
           
             if (sens[key].t=='driver') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";}
+              if(vodiy == -348201.3876){vodiy = "----";}else{
+                if(vodiy){
+                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
+                    }
             }
+          }
           
             if (sens[key].t=='trailer') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";}
+              if(agregat == -348201.3876){agregat = "----";}else{
+                if(agregat){
+                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
+                    }
             }
+          }
           
           }
           
@@ -187,8 +204,8 @@ function init() { // Execute after login succeed
   // get instance of current Session
   var session = wialon.core.Session.getInstance();
   // specify what kind of data should be returned
-  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition | wialon.item.Unit.dataFlag.pos | wialon.item.Unit.dataFlag.sensors | wialon.item.Unit.dataFlag.lastMessage;
-  var res_flags = wialon.item.Item.dataFlag.base | wialon.item.Resource.dataFlag.zones| wialon.item.Resource.dataFlag.zoneGroups;
+  var flags = wialon.item.Item.dataFlag.base | wialon.item.Unit.dataFlag.lastPosition |  wialon.item.Unit.dataFlag.sensors | wialon.item.Unit.dataFlag.lastMessage;
+  var res_flags = wialon.item.Item.dataFlag.base | wialon.item.Resource.dataFlag.zones| wialon.item.Resource.dataFlag.zoneGroups | wialon.item.Resource.dataFlag.trailers | wialon.item.Resource.dataFlag.drivers;
  
 	var remote= wialon.core.Remote.getInstance();
   remote.remoteCall('render/set_locale',{"tzOffset":7200,"language":'ru',"formatDate":'%Y-%m-%E %H:%M:%S'});
@@ -196,6 +213,8 @@ function init() { // Execute after login succeed
 	session.loadLibrary("resourceZones"); // load Geofences Library 
   session.loadLibrary("resourceZoneGroups"); // load Reports Library
   session.loadLibrary("unitSensors");
+  session.loadLibrary("resourceDrivers");
+  session.loadLibrary("resourceTrailers"); 
 
   // load Icon Library
   session.loadLibrary('itemIcon');
@@ -217,11 +236,28 @@ function init() { // Execute after login succeed
 let online_mark = {};
 let geozones = [];
 let unitsgrup = {};
+let trailersID = [];
+let driversID = [];
+
 function initUIData() {
 var session = wialon.core.Session.getInstance();
 
-if (geozones.length === 0) { 
+if (geozones.length === 0) {
+  trailersID = [];
+  driversID = [];
+
   var resource = wialon.core.Session.getInstance().getItem(601000284); //26227 - Gluhiv 20030 "11_ККЗ"
+
+  let drivers= resource.getDrivers();
+  let trailers = resource.getTrailers();
+  for (const key in trailers) {
+      trailersID[parseInt(trailers[key].c)] = trailers[key].n;
+    }
+  for (const key in drivers) {
+      driversID[parseInt(drivers[key].c)] = drivers[key].n;
+    }
+
+
   let gzgroop = resource.getZonesGroups();
   resource.getZonesData(null, function(code, geofences) {
       for (let i = 0; i < geofences.length; i++) {
@@ -280,22 +316,30 @@ $('#grupi_avto').empty();
        let fuel = '----';
            let vodiy ='----';
            let agregat ='----';
-          let sens = unit.getSensors(); // get unit's sensors
+           let sens = unit.getSensors(); // get unit's sensors
           for (key in sens) {
-            if (sens[key].n=='Паливо'||sens[key].n=='Топливо') {
+            if (sens[key].t=='fuel level') {
               fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
               if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
             }
           
-            if (sens[key].n=='Водитель'||sens[key].n=='Водій') {
+            if (sens[key].t=='driver') {
               vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";} else {vodiy = vodiy} 
+              if(vodiy == -348201.3876){vodiy = "----";}else{
+                if(vodiy){
+                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
+                    }
             }
+          }
           
-            if (sens[key].n=='Прицеп'||sens[key].n=='Причеп') {
+            if (sens[key].t=='trailer') {
               agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";} else {agregat = agregat} 
+              if(agregat == -348201.3876){agregat = "----";}else{
+                if(agregat){
+                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
+                    }
             }
+          }
           
           }
           
