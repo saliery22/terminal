@@ -441,6 +441,11 @@ function initMap() {
     fadeAnimation: false, // отключаем плавное появление слоев
     animate: false,
     zoomControl: false ,
+    fadeAnimation: false,
+    //markerZoomAnimation: false,
+    updateWhenIdle: true,
+    updateWhenZooming: false,
+    bounceAtZoomLimits: false,
     preferCanvas: true,
     attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
