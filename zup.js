@@ -308,7 +308,7 @@ $('#grupi_avto').empty();
       unit.addListener('changeLastMessage', function(event) {
 
         if (map.dragging.moving()) return;
-        
+
       var pos = event.getData();
       if (pos) {
         unitMarker.LT = pos.t; 
@@ -446,7 +446,8 @@ function initMap() {
     inertia: false,  
     zoomControl: false ,
     fadeAnimation: false,
-    //markerZoomAnimation: false,
+    zoomSnap: 0.1,
+    markerZoomAnimation: false,
     updateWhenIdle: true,
     updateWhenZooming: false,
     bounceAtZoomLimits: false,
