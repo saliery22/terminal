@@ -85,6 +85,15 @@ select {
     touch-action: none; 
 }
 
+.leaflet-marker-pane {
+    transition: none !important;
+}
+
+/* Если вы используете анимацию иконок через CSS, отключаем её при зуме */
+.leaflet-zoom-anim .leaflet-marker-pane {
+    display: none; /* Маркеры исчезнут на долю секунды при зуме и появятся в конце */
+}
+
 </style>
 
 
