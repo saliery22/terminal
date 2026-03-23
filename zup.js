@@ -3,7 +3,7 @@
 // global variables
 var map =null, marker,allunits = [], markerByUnit = {},tile_layer, layers = {};
 
-var rux=1;
+
 
 let RES_ID=601000448;// 601000284   "11_ККЗ"  601000448  "KKZ_Gluhiv"
 
@@ -12,75 +12,13 @@ function online_upd() {
 allunits.forEach(function(unit) {          
     var unitMarker =  markerByUnit[unit.getId()];
      if (unitMarker) {
-      if(unitMarker.options.opacity>0){
+      if(unitMarker.wr){
         unitMarker.setOpacity(1);
-      var sdsa = unit.getPosition();
-     let pop = unitMarker.getPopup();
-       let fuel = '----';
-           let vodiy ='----';
-           let agregat ='----';
-          let sens = unit.getSensors(); // get unit's sensors
-       for (key in sens) {
-            if (sens[key].t=='fuel level') {
-              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
-            }
-          
-            if (sens[key].t=='driver') {
-              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";}else{
-                if(vodiy){
-                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
-                    }
-            }
-          }
-          
-            if (sens[key].t=='trailer') {
-              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";}else{
-                if(agregat){
-                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
-                    }
-            }
-          }
-          
-          }
-          
-          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
-          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
-            unitMarker.setOpacity(0.6);
-          } 
-         
-    if(sdsa)unitMarker.setLatLng([sdsa.y, sdsa.x]);
-
-    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
-                          online_mark[unit.getId()] = markerstarton;
-                         }else{
-                           if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
-                           online_mark[unit.getId()] = markerstarton;
-                           }else{
-                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
-                             online_mark[unit.getId()] = markerstarton;
-                             }
-                         }
-                         }
-            }else{
-            if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
-             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
-            online_mark[unit.getId()] = markerstarton;
-            }
-            }
+          update_marker(unitMarker, unit, unit.getPosition())
           }
      }
   });    
 }
-
 
 
 // Unit markers constructor
@@ -91,14 +29,14 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 48;
+  var imsaze = 22;
   if (!unitPos) return null;
     
 
 
   marker = L.marker([unitPos.y, unitPos.x], {
-    clickable: true,
-    draggable: true,
+    //clickable: true,
+    //draggable: true,
     opacity: 1,
     icon: L.icon({
       iconUrl: unit.getIconUrl(imsaze),
@@ -108,71 +46,12 @@ function getUnitMarker(unit) {
   });
   marker.bindPopup('<center><font size="5">' + unit.getName());
     if (marker) {
-      if(marker.options.opacity>0){
+      if(marker.wr){
         marker.setOpacity(1);
-      var sdsa = unit.getPosition();
-     let pop = marker.getPopup();
-       let fuel = '----';
-           let vodiy ='----';
-           let agregat ='----';
-          let sens = unit.getSensors(); // get unit's sensors
-          for (key in sens) {
-            if (sens[key].t=='fuel level') {
-              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
-            }
-          
-            if (sens[key].t=='driver') {
-              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";}else{
-                if(vodiy){
-                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
-                    }
-            }
-          }
-          
-            if (sens[key].t=='trailer') {
-              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";}else{
-                if(agregat){
-                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
-                    }
-            }
-          }
-          
-          }
-          
-          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
-          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
-            marker.setOpacity(0.6);
-          } 
-         
-
-    if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                          online_mark[unit.getId()] = markerstarton;
-                         }else{
-                           if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                           online_mark[unit.getId()] = markerstarton;
-                           }else{
-                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                             online_mark[unit.getId()] = markerstarton;
-                             }
-                         }
-                         }
-            }else{
-            if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
-             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
-            online_mark[unit.getId()] = markerstarton;
-            }
-            }
+        update_marker(marker, unit, unit.getPosition());
           }
           marker.addTo(map);
+         
      }
 
 
@@ -187,7 +66,7 @@ function getUnitMarker(unit) {
   });
 
   // save marker for access from filtering by distance
- 
+  marker.wr =true;
   markerByUnit[unit.getId()] = marker;
   allunits.push(unit);
   return marker;
@@ -278,7 +157,7 @@ if (geozones.length === 0) {
             }
            }
            var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
-           var geozona =  L.polygon(cord, {pane: 'heavyMarkers',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
+           var geozona =  L.polygon(cord, {pane: 'heavyMarkers2',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
            geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
            geozones.push(geozona);   
       }
@@ -302,80 +181,18 @@ $('#grupi_avto').empty();
 
   var units = session.getItems('avl_unit');
   units.forEach(function(unit) {  
-     
+
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
       unit.addListener('changeLastMessage', function(event) {
 
-        if (map.dragging.moving()) return;
-
+      if (map.dragging.moving()) return;
       var pos = event.getData();
       if (pos) {
         unitMarker.LT = pos.t; 
-      if(unitMarker.options.opacity>0){
+      if(unitMarker.wr){
         unitMarker.setOpacity(1);
-      var sdsa = unit.getPosition();
-     let pop = unitMarker.getPopup();
-       let fuel = '----';
-           let vodiy ='----';
-           let agregat ='----';
-           let sens = unit.getSensors(); // get unit's sensors
-          for (key in sens) {
-            if (sens[key].t=='fuel level') {
-              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
-            }
-          
-            if (sens[key].t=='driver') {
-              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(vodiy == -348201.3876){vodiy = "----";}else{
-                if(vodiy){
-                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
-                    }
-            }
-          }
-          
-            if (sens[key].t=='trailer') {
-              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
-              if(agregat == -348201.3876){agregat = "----";}else{
-                if(agregat){
-                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
-                    }
-            }
-          }
-          
-          }
-          
-          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(sdsa.t)+'<br />' +sdsa.s+' км/год <br />'+sdsa.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
-          if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(sdsa.t)+'<br />'+sdsa.sc+' супутників <br />');
-            unitMarker.setOpacity(0.6);
-          } 
-         
-    if(sdsa)unitMarker.setLatLng([sdsa.y, sdsa.x]);
-   if(online_mark[unit.getId()]) map.removeLayer(online_mark[unit.getId()]);
-       if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
-                         if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                          online_mark[unit.getId()] = markerstarton;
-                         }else{
-                           if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                           online_mark[unit.getId()] = markerstarton;
-                           }else{
-                             if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
-                             online_mark[unit.getId()] = markerstarton;
-                             }
-                         }
-                         }
-            }else{
-            if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
-             markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
-            online_mark[unit.getId()] = markerstarton;
-            }
-            }
+        update_marker(unitMarker, unit, pos.pos);
           }
       }
     });
@@ -386,33 +203,80 @@ $('#grupi_avto').empty();
 
 
 
- 
   session.searchItems({itemsType: "avl_unit_group", propName: "", propValueMask: "", sortType: "sys_name"},true, 1, 0, 0, function(code, data) {
-    if (code) {
-        return;
-    }
-    let select = document.getElementById('grupi_avto');
-    for(let i = 0; i<data.items.length; i++){
-      let name = data.items[i].$$user_name;
-      let gr= '';
-      let grup_id = data.items[i].$$user_units;
-      if(!grup_id)continue;
-      grup_id.sort()
-      for(let ii = 0; ii<grup_id.length; ii++){
-        gr+=grup_id[ii]+',';
-      }
-      gr = gr.slice(0, -1);
-      unitsgrup[name] = gr;
-      if (grup_id.length>0) {
-        let newOption = new Option(name+" ("+data.items[i].$$user_units.length+")", name);
-         select.append(newOption);
-      }
-    }
-     select.value = "11_ККЗ Загальна";
-    });
+    if (code || !data) return;
 
+    const box = document.getElementById('box');
+    box.innerHTML = ''; // Очищаем контейнер перед заполнением
+
+    // Добавляем вариант "Все", если нужно
+    // names.push("Все"); 
+
+    for (let i = 0; i < data.items.length; i++) {
+
+        let item = data.items[i];
+        let name = item.$$user_name;; // В Wialon SDK имя обычно в поле .nm
+        let grup_id = item.$$user_units; // Массив ID объектов в группе обычно в поле .u
+        
+        if (!grup_id || grup_id.length === 0) continue;
+
+        // Сохраняем список ID для фильтрации
+        unitsgrup[name] = grup_id.join(',');
+        // Создаем чипс СРАЗУ внутри цикла
+        const el = document.createElement('div');
+        el.className = 'chip';
+        // Делаем активным первый найденный или конкретный (например "11_ККЗ Загальна")
+        if (name === "11_ККЗ Загальна") el.classList.add('active');
+        
+        el.textContent = name;
+        
+        el.onclick = function() {
+            // Убираем активный класс у всех
+            const activeChip = box.querySelector('.chip.active');
+            if (activeChip) activeChip.classList.remove('active');
+            
+            // Добавляем текущему
+            this.classList.add('active');
+            
+            // Скроллим
+            this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            
+            // Вызываем фильтрацию
+            if (typeof filterMarkers === 'function') {
+                filterMarkers(name);
+            }
+        };
+        box.appendChild(el);
+    }
+        setTimeout(() => {
+        const defaultActive = box.querySelector('.chip.active');
+        if (defaultActive) {
+            defaultActive.scrollIntoView({ behavior: 'auto', inline: 'center' });
+        }
+    }, 200); 
+});
     
 }
+
+let isWorkFilterActive = false;
+
+document.getElementById('filter_work').onclick = function() {
+
+    isWorkFilterActive = !isWorkFilterActive;
+    this.classList.toggle('active', isWorkFilterActive);
+
+        for (const key in online_mark) {  map.removeLayer(online_mark[key])}
+        online_upd();
+
+
+};
+
+function filterMarkers(category) {
+  chuse(category);
+   for (const key in online_mark) {  map.removeLayer(online_mark[key])}
+        online_upd();
+}
+
 
   setInterval(function() {
   if (typeof markerByUnit === 'undefined' || !markerByUnit) return;
@@ -422,17 +286,81 @@ $('#grupi_avto').empty();
             if((Date.now())/1000-parseInt(marker.LT)>3600){
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
-                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
+                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
                           online_mark[unitId] = markerstarton;
                          }else{
-                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
+                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
                              online_mark[unitId] = markerstarton;
                          }
             }
   }
   }, 60000); 
 
+  
+function update_marker(marker, unit, data) {
+    if(!data)return;
+     let id = unit.getId();
+     if(online_mark[id]) map.removeLayer(online_mark[id]);
+      if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
+                         if(isWorkFilterActive){
+                          marker.setOpacity(0);
+                          return;
+                         }
+                         if((Date.now())/1000-parseInt(data.t)>21600){
+                          let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                          online_mark[id] = markerstarton;
+                         }else{
+                           if(parseInt(data.sc)<5){
+                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                           online_mark[id] = markerstarton;
+                           }else{
+                             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                             online_mark[id] = markerstarton;
+                         }
+                         }
+            }else{
+            if(parseInt(data.s)>0){
+            let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "move.png",iconSize:[60,60],iconAnchor:[30, 30]})}).addTo(map);
+             markerstarton.setRotationAngle(parseInt(data.c)-90);
+            online_mark[id] = markerstarton;
+            }
+            }
+    marker.setLatLng([data.y, data.x]);
+    let pop = marker.getPopup();
+    let fuel = '----';
+    let vodiy ='----';
+    let agregat ='----';
+    let sens = unit.getSensors(); // get unit's sensors
+       for (key in sens) {
+            if (sens[key].t=='fuel level') {
+              fuel = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(fuel == -348201.3876){fuel = "----";} else {fuel = fuel.toFixed();} 
+            }
+            if (sens[key].t=='driver') {
+              vodiy = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(vodiy == -348201.3876){vodiy = "----";}else{
+                if(vodiy){
+                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
+                    }
+            }
+          }
+            if (sens[key].t=='trailer') {
+              agregat = unit.calculateSensorValue(unit.getSensor(sens[key].id), unit.getLastMessage());
+              if(agregat == -348201.3876){agregat = "----";}else{
+                if(agregat){
+                      if(trailersID[agregat]){agregat = trailersID[agregat];}else{agregat = "картка-"+agregat;}
+                    }
+            }
+          }
+          }
+          
+          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(data.t)+'<br />' +data.s+' км/год <br />'+data.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
+            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(data.t)+'<br />'+data.sc+' супутників <br />');
+            marker.setOpacity(0.6);
+          } 
 
+}
 
 var layerControl=0;
 function initMap() {
@@ -458,23 +386,33 @@ function initMap() {
   map.createPane('heavyMarkers');
 // Устанавливаем ему z-index, чтобы он был над картой, но под важными элементами
 map.getPane('heavyMarkers').style.zIndex = 600; 
+  map.createPane('heavyMarkers2');
+// Устанавливаем ему z-index, чтобы он был над картой, но под важными элементами
+map.getPane('heavyMarkers2').style.zIndex = 500; 
   
  // Скрываем маркеры, когда начался зум пальцами
 map.on('zoomstart', function() {
     map.getPane('heavyMarkers').style.display = 'none';
+    map.getPane('heavyMarkers2').style.display = 'none';
 });
 
 // Возвращаем иконки только после того, как зум полностью завершился
 map.on('zoomend', function() {
      map.getPane('heavyMarkers').style.display = 'block';
+     map.getPane('heavyMarkers2').style.display = 'block';
 });
 
 
-  var basemaps = {
-    OSM:L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {}),
+var basemaps = {
+    "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }),
 
-    'Google Hybrid':L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{ subdomains:['mt0','mt1','mt2','mt3'],layers: 'OSM-Overlay-WMS,TOPO-WMS'})
-
+    "Google Hybrid": L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0','mt1','mt2','mt3'],
+        attribution: 'Map data &copy; Google',
+        maxZoom: 20 // У Google Hybrid детальность выше, чем у OSM
+    })
 };
 
 
@@ -624,7 +562,7 @@ function show_track (time1,time2) {
 		"timeTo": to, // interval end
 		"tripDetector": 0, //use trip detector: 0 - no, 1 - yes
 		"trackColor": color, //track color in ARGB format (A - alpha channel or transparency level)
-		"trackWidth": 4, // track line width in pixels
+		"trackWidth": 2, // track line width in pixels
 		"arrows": 1, //show course of movement arrows: 0 - no, 1 - yes
 		"points": 0, // show points at places where messages were received: 0 - no, 1 - yes
 		"pointColor": color, // points color
@@ -641,39 +579,27 @@ function clear(){
 }
 
 
- $( "#grupi_avto" ).on( "change", function() {
-  chuse(this.value);
-   for (const key in online_mark) {  map.removeLayer(online_mark[key])}
-        online_upd();
- });
 
 
 function chuse(vibor) {
-  var nmm,mm,idd;
   let str = null;
   if (unitsgrup[vibor]){ str = unitsgrup[vibor].split(','); }
-  rux = 0;
-  if (!str){rux = 1;}
 
-  
-for(var i=0; i < allunits.length; i++){
-idd =allunits[i].getId();
-mm = markerByUnit[idd];
- mm.setOpacity(0);
- mm.setZIndexOffset(-900);
-
- if (str){
+  Object.values(markerByUnit).forEach(function(marker) {
+    if (marker) {
+        marker.setOpacity(0); // Показать все
+        marker.setZIndexOffset(-900);
+        marker.wr =false;
+    }
+});
  str.forEach((element) => {
-  if(idd==element){
+    let mm = markerByUnit[element];
     mm.setOpacity(1);
     mm.setZIndexOffset(1);
-  }
-});
- continue;
- }
+    mm.wr =true;
 
-      
-}
+});
+
 }
 
 
@@ -745,7 +671,7 @@ $('#serch_bt').click(function() {
   speech();
 });
 
-$('#speech_me_bt').click(function() { 
+$('#me').click(function() { 
   if (my_icon){
      map.closePopup();
      map.setView(my_icon.getLatLng());
@@ -784,8 +710,8 @@ function success(position) {
       icon: L.icon({
         zIndexOffset: 1000,
         iconUrl: '111.png',
-        iconSize:   [48, 48],
-        iconAnchor: [24, 24] // set icon center
+        iconSize:   [24, 24],
+        iconAnchor: [12, 12] // set icon center
       })
     }).addTo(map);
     updatePopupContent();
@@ -805,7 +731,7 @@ function success(position) {
         let y=allunits[i].getPosition().y;
         let x=allunits[i].getPosition().x;
         if (!my_line){
-          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:2,opacity:1}).addTo(map);
+          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
         }else{
           my_line.setLatLngs([[y, x],[position.coords.latitude,position.coords.longitude]]);
         }
@@ -816,7 +742,7 @@ function success(position) {
 
     if(position.coords.accuracy<30){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
-        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:4,opacity:1}).addTo(map);
+        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:2,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
         x_pr=position.coords.longitude;
         y_pr2=position.coords.latitude;
