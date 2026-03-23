@@ -56,22 +56,22 @@ allunits.forEach(function(unit) {
 
     if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
                          if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
                           online_mark[unit.getId()] = markerstarton;
                          }else{
                            if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
                            online_mark[unit.getId()] = markerstarton;
                            }else{
                              if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]}),zIndexOffset:-1000}).addTo(map);
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[32,32],iconAnchor:[16, 16]})}).addTo(map);
                              online_mark[unit.getId()] = markerstarton;
                              }
                          }
                          }
             }else{
             if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
              markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
             online_mark[unit.getId()] = markerstarton;
             }
@@ -151,22 +151,22 @@ function getUnitMarker(unit) {
 
     if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
                          if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                           online_mark[unit.getId()] = markerstarton;
                          }else{
                            if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                            online_mark[unit.getId()] = markerstarton;
                            }else{
                              if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                              online_mark[unit.getId()] = markerstarton;
                              }
                          }
                          }
             }else{
             if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
              markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
             online_mark[unit.getId()] = markerstarton;
             }
@@ -356,22 +356,22 @@ $('#grupi_avto').empty();
    if(online_mark[unit.getId()]) map.removeLayer(online_mark[unit.getId()]);
        if((Date.now())/1000-parseInt(sdsa.t)>3600 || parseInt(sdsa.sc)<5){
                          if((Date.now())/1000-parseInt(sdsa.t)>21600){
-                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                           online_mark[unit.getId()] = markerstarton;
                          }else{
                            if(parseInt(sdsa.sc)<5){
-                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                           let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                            online_mark[unit.getId()] = markerstarton;
                            }else{
                              if((Date.now())/1000-parseInt(sdsa.t)>3600){
-                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                             let markerstarton = L.marker([sdsa.y, sdsa.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                              online_mark[unit.getId()] = markerstarton;
                              }
                          }
                          }
             }else{
             if(parseInt(sdsa.s)>0){
-            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]}),zIndexOffset:-1000}).addTo(map);
+            let markerstarton = L.marker([sdsa.y, sdsa.x],{icon: L.icon({interactive: false, pane: 'heavyMarkers', iconUrl: "move.png",iconSize:[100,100],iconAnchor:[50, 50]})}).addTo(map);
              markerstarton.setRotationAngle(parseInt(sdsa.c)-90);
             online_mark[unit.getId()] = markerstarton;
             }
@@ -422,10 +422,10 @@ $('#grupi_avto').empty();
             if((Date.now())/1000-parseInt(marker.LT)>3600){
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
-                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                           online_mark[unitId] = markerstarton;
                          }else{
-                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]}),zIndexOffset:-1000}).addTo(map);
+                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[24,24],iconAnchor:[12, 12]})}).addTo(map);
                              online_mark[unitId] = markerstarton;
                          }
             }
@@ -443,7 +443,7 @@ function initMap() {
     doubleClickZoom: true,
     fadeAnimation: false, // отключаем плавное появление слоев
     animate: false,
-    inertia: false,  
+    //inertia: false,  
     zoomControl: false ,
     fadeAnimation: false,
     zoomSnap: 0.1,
@@ -488,16 +488,36 @@ L.control.zoom({
 
 }
 
+
 document.addEventListener("visibilitychange", function() {
     if (!document.hidden) {
-        // Проверяем, авторизованы ли мы еще в Wialon
+        console.log("Проверка связи после сна...");
+        
         var session = wialon.core.Session.getInstance();
-        if (!session || !session.getCurrUser()) {
-            console.log("Сессия потеряна, переподключаемся...");
+        
+        // 1. Проверяем, жив ли ID сессии
+        if (!session || !session.getId()) {
+            console.log("Сессия полностью исчезла. Перезагрузка...");
             initApp(); 
+            return;
         }
+
+        // 2. Делаем тестовый запрос (ping), чтобы проверить реальный статус
+        // Если сервер не ответит - значит сокет сдох
+        session.updateDataFlags([], function(code) {
+            if (code !== 0) {
+                console.log("Связь с сервером Wialon потеряна (код " + code + "). Релоад...");
+               initApp();
+            } else {
+                console.log("Связь в норме, работаем.");
+                // Здесь можно вызвать принудительное обновление маркеров
+                online_upd(); 
+            }
+        });
     }
 });
+
+
 
 $(document).ready(function () {
  initApp();
@@ -738,6 +758,8 @@ let my_icon=null;
 let my_line=null;
 let y_pr=0;
 let x_pr=0;
+let y_pr2=0;
+let x_pr2=0;
 let geo_options = {
   enableHighAccuracy: true,
   maximumAge: 0,
@@ -797,12 +819,14 @@ function success(position) {
         L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0,0,255)',weight:4,opacity:1}).addTo(map);
         y_pr=position.coords.latitude;
         x_pr=position.coords.longitude;
+        y_pr2=position.coords.latitude;
+        x_pr2=position.coords.longitude;
       }
     }else{
           if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
-        L.polyline([[y_pr, x_pr],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 0, 0)',weight:2,opacity:1}).addTo(map);
-        y_pr=position.coords.latitude;
-        x_pr=position.coords.longitude;
+        L.polyline([[y_pr2, x_pr2],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 0, 0)',weight:2,opacity:1}).addTo(map);
+        y_pr2=position.coords.latitude;
+        x_pr2=position.coords.longitude;
       }
     }
    
