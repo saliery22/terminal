@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TERMINAL GPS</title>
     <script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="//hst-api.wialon.com/wsdk/script/wialon.js"></script>
@@ -13,85 +14,199 @@
      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
      crossorigin=""/>
 
-    
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Ссылка на шрифт -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 
 </head>
 <body>
 <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: -apple-system, sans-serif; background: #eee; }
+        #map { position: absolute; inset: 0; z-index: 1; }
+        
+        .ui-bottom { 
+            position: absolute; bottom: 70px; left: 0; right: 0; 
+            z-index: 1000; pointer-events: none; display: flex;
+            flex-direction: column; align-items: center;
+        }
+        .ui-bottom * { pointer-events: auto; }
 
-*{   font-family: "Arial"; font-size: 24px;  touch-action: manipulation; /* масштабирование при двойном тапе не происходит */ }
-#map { width: 100%; height:65vh;   font-family: "Arial"; font-size: 24px; margin: auto; border-bottom: 2px solid #b1b1b1;}
+        .search-wrapper { 
+            width: calc(100% - 12px); 
+            height: 40px; 
+            background: white;
+            border-radius: 20px; 
+            display: flex;
+            align-items: center; 
+            padding: 3px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
 
+        .search-wrapper input {
+            flex: 1; border: none; outline: none; font-size: 14px; 
+            background: transparent; height: 100%; padding: 0 10px;
+        }
 
-body {
-  overscroll-behavior-y: none; /* После этого свайп вниз не будет вызывать обновление страницы */
+        .btn-mic {
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            border: none;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background: #c4c5c5; /* Светло-серый фон Google */
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .btn-mic:active { background: #e8eaed; }
+
+        /* Вытянутая кнопка поиска (уже с синим фоном) */
+        .btn-search-integrated { 
+            height: 34px; 
+            padding: 0 16px; 
+            background: #1a73e8; /* Яркий синий фон */
+            color: white; 
+            border: none; 
+            border-radius: 17px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(26,115,232,0.5); /* Тень для объема */
+        }
+        .btn-search-integrated:active { background: #1557b0; transform: scale(0.98); }
+
+        .chips { width: 100%; display: flex; gap: 6px; overflow-x: auto; padding: 0 6px 4px 6px; scrollbar-width: none; box-sizing: border-box; }
+        .chips::-webkit-scrollbar { display: none; }
+        .chip { flex: 0 0 auto; background: white; padding: 6px 14px; border-radius: 16px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); border: 1px solid #eee; }
+        .chip.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+
+        .btn-loc { position: absolute; bottom: 320px; right: 10px; width: 56px; height: 56px; background: white; border-radius: 50%; border: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* Увеличиваем контейнер и кнопки в 3 раза */
+        .leaflet-control-zoom {
+            margin-bottom: 200px !important; 
+            margin-right: 10px !important;
+            border: none !important; /* Убираем стандартную рамку для красоты */
+        }
+
+        /* Настраиваем размер каждой кнопки (стандарт 30px * 3 = 90px) */
+        .leaflet-touch .leaflet-control-zoom-in, 
+        .leaflet-touch .leaflet-control-zoom-out,
+        .leaflet-control-zoom-in, 
+        .leaflet-control-zoom-out {
+            width: 56px !important;
+            height: 56px !important;
+            line-height: 56px !important; /* Центровка текста по вертикали */
+            font-size: 24px !important;    /* Размер значков + и - */
+            color: #5f6368 !important;    /* Синий цвет значков */
+            background-color: white !important;
+        }
+
+        /* Скругляем края (опционально, для стиля Google Maps) */
+        .leaflet-control-zoom-in {
+            border-bottom: 1px solid #ccc !important;
+            border-top-left-radius: 50% !important;
+            border-top-right-radius: 50% !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+        }
+        .leaflet-control-zoom-out {
+            border-bottom-left-radius: 50% !important;
+            border-bottom-right-radius: 50% !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+        }
+        /* Состояние, когда меню ЗАКРЫТО */
+        .leaflet-control-layers {
+            width: 56px !important;
+            height: 56px !important;
+            border: none !important;
+            border-radius: 50% !important; /* Круглая форма */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+            transition: all 0.2s; /* Плавный переход */
+            overflow: hidden;
+            background: white !important;
+        }
+
+        /* Центрируем иконку внутри круга */
+        .leaflet-control-layers-toggle {
+            width: 56px !important;
+            height: 56px !important;
+            background-size: 26px 26px !important; /* Размер иконки слоев */
+            background-position: center !important;
+        }
+
+        /* Состояние, когда меню РАЗВЕРНУТО (стандартный вид) */
+        .leaflet-control-layers-expanded {
+            width: auto !important; /* Возвращаем ширину по контенту */
+            height: auto !important; /* Возвращаем высоту */
+            border-radius: 8px !important; /* Делаем углы чуть скругленными, но не круглыми */
+            padding: 10px !important;
+            overflow: visible; /* Чтобы текст не обрезался */
+        }
+
+        /* Убираем иконку слоев, когда меню открыто (как в стандарте) */
+        .leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+            display: none;
+        }
+        .leaflet-popup-content-wrapper{
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-work {
+            position: absolute; 
+            bottom: 385px;
+            right: 10px;
+            width: 56px !important;
+            height: 56px !important;
+            background: white; /* Фон кнопки */
+            border: none !important;
+            border-radius: 50% !important; /* Круглая форма */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important; /* Глубокая тень */
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; /* Убираем внутренние отступы для центровки иконки */
+            transition: all 0.2s ease;
+        }
+
+       /* Стиль, если фильтр включен (Зеленый фон) */
+        .btn-work.active {
+            background: #1a73e8 !important;
+        }
+
+        .btn-work.active svg {
+            fill: white !important;
+        }
+
+.map-watermark {
+    position: absolute;
+    bottom: 5px;   /* Максимально низко */
+    left: 8px;     /* В самом углу слева */
+    z-index: 500;  /* Ниже, чем кнопки (1000), но выше карты (1) */
+    background: rgba(255, 255, 255, 0.4); /* Делаем прозрачнее, чтобы не бросалась в глаза */
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #444;
+    pointer-events: none; /* Пропускает клики */
+    border: none;
+    box-shadow: none; /* Убираем тень, чтобы не спорила с чипсами */
 }
 
 
 
-
-
-
-select { 
-    background:  #F0F0F0;
-    font-size: 24px;
-}
-
-
-.leaflet-control-layers-toggle {
-    width: 150px !important;  /* Жесткая ширина */
-    height: 150px !important; /* Жесткая высота */
-    background-size: 100px 100px !important; /* Увеличиваем саму иконку внутри */
-    background-position: center !important;   /* Центрируем иконку */
-}
-
-/* Если нужно, чтобы само меню (когда навел мышкой) тоже было крупным */
-.leaflet-control-layers-expanded {
-    font-size: 24px !important; /* Увеличиваем текст в списке слоев */
-    padding: 20px !important;
-}
-
-/* Увеличиваем чекбоксы внутри меню */
-.leaflet-control-layers-selector {
-    transform: scale(2); /* Делаем галочки в 2 раза больше */
-    margin-right: 15px !important;
-}
-
-/* Увеличиваем весь контейнер кнопок */
-.leaflet-control-zoom.leaflet-bar {
-    border: 2px solid #ccc !important;
-}
-
-/* Стили для самих кнопок + и - */
-.leaflet-control-zoom-in, 
-.leaflet-control-zoom-out {
-    width: 90px !important;    /* Было 60, стало 90 */
-    height: 90px !important;   /* Было 60, стало 90 */
-    line-height: 90px !important; /* Центрируем символ под новый размер */
-    font-size: 48px !important;   /* Было 32, стало 48 */
-}
-
-.leaflet-popup-content-wrapper, .leaflet-popup-tip {
-    background: rgba(255, 255, 255, 0.7) !important; /* 0.7 — уровень прозрачности */
-    box-shadow: 0 3px 14px rgba(0,0,0,0.2);
-}
-
-.leaflet-container {
-    /* Подсказываем браузеру использовать видеокарту для перемещения слоев */
-    transform: translate3d(0,0,0);
-    will-change: transform;
-    /* Убирает задержку тапа в 300мс на старых мобильных браузерах */
-    touch-action: none; 
-}
-
-.leaflet-marker-pane {
-    transition: none !important;
-}
-
-
-
-</style>
+    </style>
 
 
 <!-- load map -->
@@ -100,25 +215,44 @@ select {
      crossorigin=""></script>
      <script src="leaflet.rotatedMarker.js"></script>
 
-<br>
-<select  id="grupi_avto" style='width: 100%; height:4vh'>
-</select>  
-<br>
-<br>
-<div id="map"></div>
-<br>
-    <div>
-    <input id="lis0" type="text" style = "width: 70%; height:4vh"><button id="serch_bt" style = "width: 29%; height:4vh"> ПОШУК</button>
-    </div>
 
-    <br>
-    <button id="speech_bt" style = "width: 100%; height:4vh">ГОЛОСОВИЙ ПОШУК</button>
-    <br>
-    <br>
-    <button id="speech_me_bt" style = "width: 100%; height:4vh">ЗНАЙТИ МЕНЕ</button>
 
 <!-- <div id="log"></div> -->
+<div id="map"></div>
 
+<!-- Добавьте это рядом с кнопкой .btn-loc или в .ui-bottom -->
+<button class="btn-work" id="filter_work">
+   <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368">
+    <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+   </svg>
+</button>
+<!-- Кнопка локации (SVG иконка) -->
+<button class="btn-loc" id="me">
+   <svg width="22" height="22" viewBox="0 0 24 24" fill="#5f6368"> <!-- Серый цвет Google -->
+    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+</svg>
+</button>
+
+<div class="ui-bottom">
+    
+    
+    <div class="search-wrapper">
+        <!-- Кнопка Микрофон (SVG иконка) -->
+        <button class="btn-mic" id="speech_bt">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ea4335"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+        
+        <input id="lis0" type="text" placeholder="Поиск техники...">
+        
+        <!-- Кнопка Найти (SVG иконка) -->
+        <button class="btn-search-integrated" id="serch_bt">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="chips" id="box"></div>
+
+</div>
+ <div class="map-watermark">  Пальгуй Сергій </div>
 <script src="zup.js"></script> 
 
 
