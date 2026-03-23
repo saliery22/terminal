@@ -14,7 +14,7 @@ allunits.forEach(function(unit) {
      if (unitMarker) {
       if(unitMarker.wr){
         unitMarker.setOpacity(1);
-          update_marker(unitMarker, unit, unit.getPosition())
+          update_marker(unitMarker, unit, unit.getPosition(),unit.getPosition().t)
           }
      }
   });    
@@ -44,12 +44,9 @@ function getUnitMarker(unit) {
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
-  marker.bindPopup('<center><font size="5">' + unit.getName());
+  marker.bindPopup('<center><font size="1">' + unit.getName());
     if (marker) {
-      if(marker.wr){
-        marker.setOpacity(1);
-        update_marker(marker, unit, unit.getPosition());
-          }
+        update_marker(marker, unit, unit.getPosition() ,unit.getPosition().t);
           marker.addTo(map);
          
      }
@@ -61,7 +58,7 @@ function getUnitMarker(unit) {
      $("#lis0").val(unit.getName());
      chus_unit_id = unitId;
      layers[0]=0;
-     show_track();
+     if(this.options.opacity>0) show_track();
 
   });
 
@@ -191,8 +188,7 @@ $('#grupi_avto').empty();
       if (pos) {
         unitMarker.LT = pos.t; 
       if(unitMarker.wr){
-        unitMarker.setOpacity(1);
-        update_marker(unitMarker, unit, pos.pos);
+        update_marker(unitMarker, unit, pos.pos ,pos.t);
           }
       }
     });
@@ -297,7 +293,7 @@ function filterMarkers(category) {
   }, 60000); 
 
   
-function update_marker(marker, unit, data) {
+function update_marker(marker, unit, data ,time) {
     if(!data)return;
      let id = unit.getId();
      if(online_mark[id]) map.removeLayer(online_mark[id]);
@@ -354,9 +350,9 @@ function update_marker(marker, unit, data) {
           }
           }
           
-          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(data.t)+'<br />' +data.s+' км/год <br />'+data.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
+          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(time)+'<br />' +data.s+' км/год <br />'+data.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
           if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
-            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(data.t)+'<br />'+data.sc+' супутників <br />');
+            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(time)+'<br />'+data.sc+' супутників <br />');
             marker.setOpacity(0.6);
           } 
 
@@ -592,13 +588,20 @@ function chuse(vibor) {
         marker.wr =false;
     }
 });
- str.forEach((element) => {
-    let mm = markerByUnit[element];
-    mm.setOpacity(1);
-    mm.setZIndexOffset(1);
-    mm.wr =true;
+    str.forEach((element) => {
+        let id = element.trim(); // убираем лишние пробелы
+        let mm = markerByUnit[id];
 
-});
+        // ГЛАВНАЯ ПРОВЕРКА: существует ли маркер для этого ID?
+        if (mm && typeof mm.setOpacity === 'function') {
+            mm.setOpacity(1);
+            mm.setZIndexOffset(1);
+            mm.wr =true;
+        } else {
+            // Если маркера нет, просто пропускаем его, не выдавая ошибку
+            console.warn("Маркер для ID " + id + " не найден в markerByUnit (возможно, объект еще не загружен)");
+        }
+    });
 
 }
 
