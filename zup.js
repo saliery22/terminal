@@ -118,52 +118,6 @@ let driversID = [];
 function initUIData() {
 var session = wialon.core.Session.getInstance();
 
-if (geozones.length === 0) {
-  trailersID = [];
-  driversID = [];
-
-  var resource = wialon.core.Session.getInstance().getItem(601000284); //26227 - Gluhiv 20030 "11_ККЗ"
-
-  let drivers= resource.getDrivers();
-  let trailers = resource.getTrailers();
-  for (const key in trailers) {
-      trailersID[parseInt(trailers[key].c)] = trailers[key].n;
-    }
-  for (const key in drivers) {
-      driversID[parseInt(drivers[key].c)] = drivers[key].n;
-    }
-
-
-  let gzgroop = resource.getZonesGroups();
-  resource.getZonesData(null, function(code, geofences) {
-      for (let i = 0; i < geofences.length; i++) {
-        cord=[];
-         var zone = geofences[i];
-         if(zone.n[2]=='к' || zone.n[3]=='к') continue;
-            if (zone.p && zone.p.length) {
-                for (let j = 0; j < zone.p.length; j++) {
-                    cord.push([zone.p[j].y, zone.p[j].x]); // Wialon y=lat, x=lon
-                }
-            } else { continue; }
-         var zonegr="";
-           for (var key in gzgroop) {
-            if(gzgroop[key].n[0]!='*' && gzgroop[key].n[0]!='#'){
-           gzgroop[key].zns.forEach(function(item, arr) {
-           if(item==zone.id){zonegr=gzgroop[key].n;return;}
-           });
-            }
-           }
-           var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
-           var geozona =  L.polygon(cord, {pane: 'heavyMarkers2',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
-           geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
-           geozones.push(geozona);   
-      }
-      let lgeozone = L.layerGroup(geozones);
-      layerControl.addOverlay(lgeozone, "Геозони");
-  });
-}
-
-
 $('#grupi_avto').empty();
  for (let id in online_mark) {
       if (online_mark[id]) map.removeLayer(online_mark[id]);
@@ -194,8 +148,6 @@ $('#grupi_avto').empty();
     });
   }
   });
-
-
 
 
 
@@ -251,7 +203,53 @@ $('#grupi_avto').empty();
         }
     }, 200); 
 });
-    
+
+
+if (geozones.length === 0) {
+  trailersID = [];
+  driversID = [];
+
+  var resource = wialon.core.Session.getInstance().getItem(601000284); //26227 - Gluhiv 20030 "11_ККЗ"
+
+  let drivers= resource.getDrivers();
+  let trailers = resource.getTrailers();
+  for (const key in trailers) {
+      trailersID[parseInt(trailers[key].c)] = trailers[key].n;
+    }
+  for (const key in drivers) {
+      driversID[parseInt(drivers[key].c)] = drivers[key].n;
+    }
+
+
+  let gzgroop = resource.getZonesGroups();
+  resource.getZonesData(null, function(code, geofences) {
+      for (let i = 0; i < geofences.length; i++) {
+        cord=[];
+         var zone = geofences[i];
+         if(zone.n[2]=='к' || zone.n[3]=='к') continue;
+            if (zone.p && zone.p.length) {
+                for (let j = 0; j < zone.p.length; j++) {
+                    cord.push([zone.p[j].y, zone.p[j].x]); // Wialon y=lat, x=lon
+                }
+            } else { continue; }
+         var zonegr="";
+           for (var key in gzgroop) {
+            if(gzgroop[key].n[0]!='*' && gzgroop[key].n[0]!='#'){
+           gzgroop[key].zns.forEach(function(item, arr) {
+           if(item==zone.id){zonegr=gzgroop[key].n;return;}
+           });
+            }
+           }
+           var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
+           var geozona =  L.polygon(cord, {pane: 'heavyMarkers2',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
+           geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
+           geozones.push(geozona);   
+      }
+      let lgeozone = L.layerGroup(geozones);
+      layerControl.addOverlay(lgeozone, "Геозони");
+  });
+}
+  
 }
 
 let isWorkFilterActive = false;
