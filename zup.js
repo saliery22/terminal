@@ -282,10 +282,10 @@ function filterMarkers(category) {
             if((Date.now())/1000-parseInt(marker.LT)>3600){
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
-                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
                           online_mark[unitId] = markerstarton;
                          }else{
-                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
                              online_mark[unitId] = markerstarton;
                          }
             }
@@ -303,14 +303,14 @@ function update_marker(marker, unit, data ,time) {
                           return;
                          }
                          if((Date.now())/1000-parseInt(data.t)>21600){
-                          let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                          let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
                           online_mark[id] = markerstarton;
                          }else{
                            if(parseInt(data.sc)<5){
-                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
                            online_mark[id] = markerstarton;
                            }else{
-                             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[20,20],iconAnchor:[12, 12]})}).addTo(map);
+                             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
                              online_mark[id] = markerstarton;
                          }
                          }
