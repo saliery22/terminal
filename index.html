@@ -27,7 +27,7 @@
         #map { position: absolute; inset: 0; z-index: 1; }
         
         .ui-bottom { 
-            position: absolute; bottom: 70px; left: 0; right: 0; 
+            position: absolute; bottom: 44px; left: 0; right: 0; 
             z-index: 1000; pointer-events: none; display: flex;
             flex-direction: column; align-items: center;
         }
@@ -35,9 +35,9 @@
 
         .search-wrapper { 
             width: calc(100% - 12px); 
-            height: 40px; 
+            height: 52px; 
             background: white;
-            border-radius: 20px; 
+            border-radius: 26px; 
             display: flex;
             align-items: center; 
             padding: 3px; 
@@ -52,8 +52,8 @@
         }
 
         .btn-mic {
-            width: 32px; 
-            height: 32px; 
+            width: 48px; 
+            height: 48px; 
             border-radius: 50%; 
             border: none;
             display: flex; 
@@ -68,12 +68,12 @@
 
         /* Вытянутая кнопка поиска (уже с синим фоном) */
         .btn-search-integrated { 
-            height: 34px; 
+            height: 48px; 
             padding: 0 16px; 
             background: #1a73e8; /* Яркий синий фон */
             color: white; 
             border: none; 
-            border-radius: 17px; 
+            border-radius: 24px; 
             display: flex; 
             align-items: center; 
             justify-content: center;
@@ -87,14 +87,14 @@
 
         .chips { width: 100%; display: flex; gap: 6px; overflow-x: auto; padding: 0 6px 4px 6px; scrollbar-width: none; box-sizing: border-box; }
         .chips::-webkit-scrollbar { display: none; }
-        .chip { flex: 0 0 auto; background: white; padding: 6px 14px; border-radius: 16px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); border: 1px solid #eee; }
+        .chip { flex: 0 0 auto; background: white; padding: 9px 14px; border-radius: 18px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); border: 1px solid #eee; }
         .chip.active { background: #1a73e8; color: white; border-color: #1a73e8; }
 
-        .btn-loc { position: absolute; bottom: 320px; right: 10px; width: 56px; height: 56px; background: white; border-radius: 50%; border: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-loc { position: absolute; bottom: 250px; right: 10px; width: 48px; height: 48px; background: white; border-radius: 50%; border: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         /* Увеличиваем контейнер и кнопки в 3 раза */
         .leaflet-control-zoom {
-            margin-bottom: 200px !important; 
+            margin-bottom: 366px !important; 
             margin-right: 10px !important;
             border: none !important; /* Убираем стандартную рамку для красоты */
         }
@@ -104,9 +104,9 @@
         .leaflet-touch .leaflet-control-zoom-out,
         .leaflet-control-zoom-in, 
         .leaflet-control-zoom-out {
-            width: 56px !important;
-            height: 56px !important;
-            line-height: 56px !important; /* Центровка текста по вертикали */
+            width: 48px !important;
+            height: 48px !important;
+            line-height: 48px !important; /* Центровка текста по вертикали */
             font-size: 24px !important;    /* Размер значков + и - */
             color: #5f6368 !important;    /* Синий цвет значков */
             background-color: white !important;
@@ -126,8 +126,8 @@
         }
         /* Состояние, когда меню ЗАКРЫТО */
         .leaflet-control-layers {
-            width: 56px !important;
-            height: 56px !important;
+            width: 48px !important;
+            height: 48px !important;
             border: none !important;
             border-radius: 50% !important; /* Круглая форма */
             box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
@@ -138,8 +138,8 @@
 
         /* Центрируем иконку внутри круга */
         .leaflet-control-layers-toggle {
-            width: 56px !important;
-            height: 56px !important;
+            width: 48px !important;
+            height: 48px !important;
             background-size: 26px 26px !important; /* Размер иконки слоев */
             background-position: center !important;
         }
@@ -163,10 +163,10 @@
 
         .btn-work {
             position: absolute; 
-            bottom: 385px;
+            bottom: 308px;
             right: 10px;
-            width: 56px !important;
-            height: 56px !important;
+            width: 48px !important;
+            height: 48px !important;
             background: white; /* Фон кнопки */
             border: none !important;
             border-radius: 50% !important; /* Круглая форма */
@@ -191,17 +191,18 @@
 
         .map-watermark {
             position: absolute;
-            bottom: 5px;   /* Максимально низко */
-            left: 8px;     /* В самом углу слева */
-            z-index: 500;  /* Ниже, чем кнопки (1000), но выше карты (1) */
-            background: rgba(255, 255, 255, 0.4); /* Делаем прозрачнее, чтобы не бросалась в глаза */
+            bottom: 5px;
+            left: 50%; /* Смещаем начало блока на центр */
+            transform: translateX(-50%); /* Сдвигаем сам блок обратно на половину его ширины */
+            z-index: 500;
+            background: rgba(255, 255, 255, 0.4);
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 10px;
             color: #444;
-            pointer-events: none; /* Пропускает клики */
+            pointer-events: none;
             border: none;
-            box-shadow: none; /* Убираем тень, чтобы не спорила с чипсами */
+            box-shadow: none;
         }
 
 
