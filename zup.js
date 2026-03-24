@@ -44,7 +44,7 @@ function getUnitMarker(unit) {
       iconAnchor: [imsaze/2, imsaze/2] // set icon center
     })
   });
-  marker.bindPopup('<center><font size="1">' + unit.getName());
+  marker.bindPopup('<center><font size="1">' + unit.getName(),{closeButton: false});
     if (marker) {
         update_marker(marker, unit, unit.getPosition() ,unit.getPosition().t);
           marker.addTo(map);
@@ -317,7 +317,6 @@ function update_marker(marker, unit, data ,time) {
                          }
                          }
             }else{
-            marker.setOpacity(1);
             if(parseInt(data.s)>0){
             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "move.png",iconSize:[40,40],iconAnchor:[20, 20]})}).addTo(map);
              markerstarton.setRotationAngle(parseInt(data.c)-90);
@@ -353,11 +352,41 @@ function update_marker(marker, unit, data ,time) {
           }
           }
           
-          pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(time)+'<br />' +data.s+' км/год <br />'+data.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
-          if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
-            pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(time)+'<br />'+data.sc+' супутників <br />');
-            marker.setOpacity(0.5);
-          } 
+          var statusText = '';
+          var color = '#000'; // По умолчанию черный
+
+          // Проверка на актуальность данных и спутники
+          if ((Date.now()) / 1000 - parseInt(data.t) > 3600 || parseInt(data.sc) < 5) {
+              color = '#d9534f'; // Красный для проблемных
+              statusText = 
+                  '<table style="width:100%; border-bottom:1px solid #eee; margin-bottom:5px;">' +
+                      '<tr><td colspan="2" style="text-align:center; font-weight:bold; font-size:11px; color:' + color + ';">⚠️ ВІДСУТНЯ НАВІГАЦІЯ</td></tr>' +
+                  '</table>' +
+                  '<div style="font-size:11px; text-align:center; line-height:1.4;">' +
+                        unit.getName() + '<br />' +
+                      '<b>🕒:</b> ' + wialon.util.DateTime.formatTime(time) + '<br />' +
+                      '<b>📡:</b> <span style="color:' + color + ';">' + data.sc + '</span>' +
+                  '</div>';
+              marker.setOpacity(0.5);
+          } else {
+              statusText = 
+                  '<div style="min-width:50px; font-family: sans-serif;">' +
+                      '<div style="text-align:center; font-size:10px; font-weight:bold; border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;">' + 
+                          unit.getName() + 
+                      '</div>' +
+                      '<table style="width:100%; font-size:10px; border-collapse:collapse;">' +
+                          '<tr><td style="text-align:center;">🕒</td><td style="text-align:right;">' + wialon.util.DateTime.formatTime(time) + '</td></tr>' +
+                          '<tr><td style="text-align:center;">🚀</td><td style="text-align:right; font-weight:bold;">' + data.s + ' км/год</td></tr>' +
+                          '<tr><td style="text-align:center;">📡</td><td style="text-align:right;">' + data.sc + '</td></tr>' +
+                          '<tr><td style="text-align:center;">⛽</td><td style="text-align:right; font-weight:bold; color:#28a745;">' + fuel + ' л</td></tr>' +
+                          '<tr><td style="text-align:center;">👤</td><td style="text-align:right;">' + (vodiy || '—') + '</td></tr>' +
+                          '<tr><td style="text-align:center;">🚜</td><td style="text-align:right;">' + (agregat || '—') + '</td></tr>' +
+                      '</table>' +
+                  '</div>';
+              marker.setOpacity(1);
+          }
+
+          pop.setContent(statusText);
 
 }
 
