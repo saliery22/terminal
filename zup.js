@@ -729,14 +729,16 @@ function success(position) {
       icon: L.icon({
         zIndexOffset: 1000,
         iconUrl: '111.png',
-        iconSize:   [24, 24],
-        iconAnchor: [12, 12] // set icon center
+        iconSize:   [20, 20],
+        iconAnchor: [10, 10] // set icon center
       })
     }).addTo(map);
     updatePopupContent();
 
     y_pr=position.coords.latitude;
     x_pr=position.coords.longitude;
+    y_pr2=position.coords.latitude;
+    x_pr2=position.coords.longitude;
   }else{
 
       updatePopupContent();
