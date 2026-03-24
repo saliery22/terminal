@@ -280,7 +280,10 @@ function filterMarkers(category) {
             if((Date.now())/1000-parseInt(marker.LT)>3600){
               if(isWorkFilterActive){
                           marker.setOpacity(0);
+                          if (marker._icon)marker._icon.style.pointerEvents = 'none';
                           continue;
+                         }else{
+                          if (marker._icon)marker._icon.style.pointerEvents = 'auto'; 
                          }
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
@@ -302,7 +305,10 @@ function update_marker(marker, unit, data ,time) {
       if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
                          if(isWorkFilterActive){
                           marker.setOpacity(0);
+                          if (marker._icon)marker._icon.style.pointerEvents = 'none';  
                           return;
+                         }else{
+                          if (marker._icon)marker._icon.style.pointerEvents = 'auto'; 
                          }
                          if((Date.now())/1000-parseInt(data.t)>21600){
                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
