@@ -418,11 +418,11 @@ function initMap() {
   }).setView([51.62995, 33.64288], 9);
 
   map.createPane('heavyMarkers');
-// Устанавливаем ему z-index, чтобы он был над картой, но под важными элементами
-map.getPane('heavyMarkers').style.zIndex = 600; 
+  map.getPane('heavyMarkers').style.zIndex = 600; 
   map.createPane('heavyMarkers2');
-// Устанавливаем ему z-index, чтобы он был над картой, но под важными элементами
-map.getPane('heavyMarkers2').style.zIndex = 500; 
+  map.getPane('heavyMarkers2').style.zIndex = 500; 
+  map.createPane('my_navi');
+  map.getPane('my_navi').style.zIndex = 700; 
   
  // Скрываем маркеры, когда начался зум пальцами
 map.on('zoomstart', function() {
@@ -451,9 +451,6 @@ var basemaps = {
     'OSM': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19
-    }),
-    'Night': L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OSM contributors'
     }),
     'TopPlusOpen_Grey':  L.tileLayer('http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png', {
         maxZoom: 18,
@@ -763,6 +760,7 @@ function success(position) {
 
   if (!my_icon){
     my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
+      pane: 'my_navi',
       rotationAngle: 0,
       icon: L.icon({
         zIndexOffset: 1000,
