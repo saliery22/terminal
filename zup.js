@@ -29,7 +29,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 22;
+  var imsaze = 18;
   if (!unitPos) return null;
     
 
@@ -278,12 +278,16 @@ function filterMarkers(category) {
      let marker = markerByUnit[unitId];
        if (!marker || !marker.LT) continue;
             if((Date.now())/1000-parseInt(marker.LT)>3600){
+              if(isWorkFilterActive){
+                          marker.setOpacity(0);
+                          continue;
+                         }
                if(online_mark[unitId]) map.removeLayer(online_mark[unitId]);
                          if((Date.now())/1000-parseInt(marker.LT)>21600){
-                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
+                          let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
                           online_mark[unitId] = markerstarton;
                          }else{
-                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
+                            let markerstarton = L.marker(marker.getLatLng(),{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
                              online_mark[unitId] = markerstarton;
                          }
             }
@@ -301,20 +305,21 @@ function update_marker(marker, unit, data ,time) {
                           return;
                          }
                          if((Date.now())/1000-parseInt(data.t)>21600){
-                          let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
+                          let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
                           online_mark[id] = markerstarton;
                          }else{
                            if(parseInt(data.sc)<5){
-                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
+                           let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop3.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
                            online_mark[id] = markerstarton;
                            }else{
-                             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[16,16],iconAnchor:[8, 8]})}).addTo(map);
+                             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers', icon: L.icon({iconUrl: "stop2.png",iconSize:[12,12],iconAnchor:[6, 6]})}).addTo(map);
                              online_mark[id] = markerstarton;
                          }
                          }
             }else{
+            marker.setOpacity(1);
             if(parseInt(data.s)>0){
-            let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "move.png",iconSize:[60,60],iconAnchor:[30, 30]})}).addTo(map);
+            let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "move.png",iconSize:[40,40],iconAnchor:[20, 20]})}).addTo(map);
              markerstarton.setRotationAngle(parseInt(data.c)-90);
             online_mark[id] = markerstarton;
             }
@@ -351,7 +356,7 @@ function update_marker(marker, unit, data ,time) {
           pop.setContent('<center><font size="1">' + unit.getName()+'<br />' +wialon.util.DateTime.formatTime(time)+'<br />' +data.s+' км/год <br />'+data.sc+' супутників <br />'+fuel+'л' +'<br />водій ' +vodiy+'<br />прицеп ' +agregat);
           if((Date.now())/1000-parseInt(data.t)>3600 || parseInt(data.sc)<5){
             pop.setContent('<center><font size="1">' + unit.getName()+'<br /> ВІДСУТНЯ НАВІГАЦІЯ <br /> остані дані <br />'+wialon.util.DateTime.formatTime(time)+'<br />'+data.sc+' супутників <br />');
-            marker.setOpacity(0.6);
+            marker.setOpacity(0.5);
           } 
 
 }
@@ -368,7 +373,7 @@ function initMap() {
     //inertia: false,  
     zoomControl: false ,
     fadeAnimation: false,
-    zoomSnap: 0.1,
+    //zoomSnap: 0.1,
     //markerZoomAnimation: false,
     updateWhenIdle: true,
     updateWhenZooming: false,
@@ -398,21 +403,34 @@ map.on('zoomend', function() {
 
 
 var basemaps = {
-    "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
+    'Google Streets': L.tileLayer('https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
     }),
-
-    "Google Hybrid": L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-        subdomains: ['mt0','mt1','mt2','mt3'],
-        attribution: 'Map data &copy; Google',
-        maxZoom: 20 // У Google Hybrid детальность выше, чем у OSM
-    })
-};
+    'Google Hybrid': L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
+    }),
+    'OSM': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }),
+    'Night': L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OSM contributors'
+    }),
+    'TopPlusOpen_Grey':  L.tileLayer('http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png', {
+        maxZoom: 18,
+        attribution: 'Map data: &copy; <a href="http://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>'
+    }),
+    };
 
 
 layerControl=L.control.layers(basemaps).addTo(map);
 
-basemaps.OSM.addTo(map);
+basemaps['OSM'].addTo(map);
+
 
 L.control.zoom({
     position: 'bottomright' // Ставим в правый нижний угол
@@ -724,6 +742,7 @@ function success(position) {
       updatePopupContent();
      
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
+      my_icon.setZIndexOffset(1000);
       let res = $("#lis0").val();
       for (let i = 0; i<allunits.length; i++){
         if(res=='')break;
@@ -750,7 +769,7 @@ function success(position) {
         x_pr2=position.coords.longitude;
       }
     }else{
-          if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
+          if(position.coords.latitude!=y_pr2  || position.coords.longitude!=x_pr2){
         L.polyline([[y_pr2, x_pr2],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(255, 0, 0)',weight:2,opacity:1}).addTo(map);
         y_pr2=position.coords.latitude;
         x_pr2=position.coords.longitude;
