@@ -631,6 +631,7 @@ function chuse(vibor) {
         marker.setOpacity(0); // Показать все
         marker.setZIndexOffset(-900);
         marker.wr =false;
+            if (marker._icon)marker._icon.style.pointerEvents = 'none';  
     }
 });
     str.forEach((element) => {
@@ -642,6 +643,8 @@ function chuse(vibor) {
             mm.setOpacity(1);
             mm.setZIndexOffset(1);
             mm.wr =true;
+            if (mm._icon)mm._icon.style.pointerEvents = 'auto'; 
+   
         } else {
             // Если маркера нет, просто пропускаем его, не выдавая ошибку
             console.warn("Маркер для ID " + id + " не найден в markerByUnit (возможно, объект еще не загружен)");
