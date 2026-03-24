@@ -386,7 +386,7 @@ function update_marker(marker, unit, data ,time) {
                           '<tr><td style="text-align:center;">📡</td><td style="text-align:right;">' + data.sc + '</td></tr>' +
                           '<tr><td style="text-align:center;">⛽</td><td style="text-align:right; font-weight:bold; color:#28a745;">' + fuel + ' л</td></tr>' +
                           '<tr><td style="text-align:center;">👤</td><td style="text-align:right;">' + (vodiy || '—') + '</td></tr>' +
-                          '<tr><td style="text-align:center;">🚜</td><td style="text-align:right;">' + (agregat || '—') + '</td></tr>' +
+                          '<tr><td style="text-align:center;">⚙️</td><td style="text-align:right;">' + (agregat || '—') + '</td></tr>' +
                       '</table>' +
                   '</div>';
               marker.setOpacity(1);
