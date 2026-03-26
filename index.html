@@ -214,7 +214,26 @@
             box-shadow: none;
         }
 
-
+            .suggestions-top {
+                position: absolute;
+                bottom: 100%; /* Поднимаем над инпутом */
+                width: calc(100% - 102px); 
+                border-radius: 26px; 
+                left: 12;
+                background: white;
+                border: 1px solid #ccc;
+                border-bottom: none;
+                max-height: 200px;
+                overflow-y: auto;
+                display: none; /* Скрыто по умолчанию */
+                z-index: 100;
+            }
+            .suggestion-item {
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+                cursor: pointer;
+            }
+            .suggestion-item:active { background: #f0f0f0; } 
 
     </style>
 
@@ -247,12 +266,13 @@
     
     
     <div class="search-wrapper">
+        <div id="suggestions" class="suggestions-top"></div>
         <!-- Кнопка Микрофон (SVG иконка) -->
         <button class="btn-mic" id="speech_bt">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#ea4335"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
         </button>
         
-        <input id="lis0" type="text" placeholder="Поиск техники...">
+        <input id="lis0" type="text" placeholder="Поиск техники..." onfocus="this.value=''">
         
         <!-- Кнопка Найти (SVG иконка) -->
         <button class="btn-search-integrated" id="serch_bt">
