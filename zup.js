@@ -623,7 +623,9 @@ function clear(){
  if(tile_layer) {map.removeLayer(tile_layer); tile_layer=null; layers[0]=0; }
 }
 
-
+ $('#clear-search').click(function() { 
+  clear()
+});
 
 
 function chuse(vibor) {
@@ -673,7 +675,7 @@ input.addEventListener('input', function() {
     // Фильтруем массив по вхождению строки
     const matched = techNames
         .filter(name => name.toLowerCase().includes(query))
-        .slice(0, 5); 
+        .slice(0, 4); 
 
     render(matched);
 });
@@ -701,6 +703,7 @@ suggestionsBox.addEventListener('click', (e) => {
     if (e.target.classList.contains('suggestion-item')) {
         input.value = e.target.textContent;
         hideSuggestions();
+        serch_unit();
     }
 });
 
@@ -713,6 +716,9 @@ document.addEventListener('click', (e) => {
 
 
 $('#serch_bt').click(function() { 
+serch_unit();
+});
+function serch_unit() {
   let res = $("#lis0").val();
   for (let i = 0; i<allunits.length; i++){
     if(res=='')break;
@@ -730,7 +736,8 @@ $('#serch_bt').click(function() {
       break;
    }
    }
-});
+}
+
 
 
  // Создаем распознаватель
