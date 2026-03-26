@@ -66,6 +66,7 @@ function getUnitMarker(unit) {
   marker.wr =true;
   markerByUnit[unit.getId()] = marker;
   allunits.push(unit);
+  techNames.push(unit.getName());
   return marker;
 }
 
@@ -656,6 +657,58 @@ function chuse(vibor) {
 
 }
 
+let techNames = []; // Ваш массив
+
+const input = document.getElementById('lis0');
+const suggestionsBox = document.getElementById('suggestions');
+
+input.addEventListener('input', function() {
+    const query = this.value.toLowerCase().trim();
+    
+    if (query.length < 1) {
+        hideSuggestions();
+        return;
+    }
+
+    // Фильтруем массив по вхождению строки
+    const matched = techNames
+        .filter(name => name.toLowerCase().includes(query))
+        .slice(0, 5); 
+
+    render(matched);
+});
+
+function render(list) {
+    if (list.length === 0) {
+        hideSuggestions();
+        return;
+    }
+
+    suggestionsBox.innerHTML = list.map(item => 
+        `<div class="suggestion-item">${item}</div>`
+    ).join('');
+    
+    suggestionsBox.style.display = 'block';
+}
+
+function hideSuggestions() {
+    suggestionsBox.innerHTML = '';
+    suggestionsBox.style.display = 'none';
+}
+
+// Клик по подсказке
+suggestionsBox.addEventListener('click', (e) => {
+    if (e.target.classList.contains('suggestion-item')) {
+        input.value = e.target.textContent;
+        hideSuggestions();
+    }
+});
+
+// Закрытие при клике вне поиска
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrapper')) hideSuggestions();
+});
+
 
 
 
@@ -696,21 +749,22 @@ $('#serch_bt').click(function() {
     let res0 = result[0].transcript.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ0-9]/g, '');
     let res = res0.charAt(0).toUpperCase() + res0.slice(1)
     $("#lis0").val(res);
-    for (let i = 0; i<allunits.length; i++){
-      let nm=allunits[i].getName();
-      let id=allunits[i].getId();
-     if(nm.indexOf(res)>=0){
-      let y=allunits[i].getPosition().y;
-      let x=allunits[i].getPosition().x;
-      map.setView([y,x]);
-      $("#lis0").val(nm);
-      chus_unit_id = id;
-      markerByUnit[id].openPopup();
-      layers[0]=0;
-      show_track();
-        break;
-     }
-     }
+     input.dispatchEvent(new Event('input')); 
+    // for (let i = 0; i<allunits.length; i++){
+    //   let nm=allunits[i].getName();
+    //   let id=allunits[i].getId();
+    //  if(nm.indexOf(res)>=0){
+    //   let y=allunits[i].getPosition().y;
+    //   let x=allunits[i].getPosition().x;
+    //   map.setView([y,x]);
+    //   $("#lis0").val(nm);
+    //   chus_unit_id = id;
+    //   markerByUnit[id].openPopup();
+    //   layers[0]=0;
+    //   show_track();
+    //     break;
+    //  }
+    //  }
 
    
    } 
