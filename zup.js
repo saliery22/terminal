@@ -716,6 +716,7 @@ document.addEventListener('click', (e) => {
 
 
 $('#serch_bt').click(function() { 
+hideSuggestions();
 serch_unit();
 });
 function serch_unit() {
