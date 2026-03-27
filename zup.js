@@ -857,7 +857,7 @@ function success(position) {
         rotationAngle: 0,
         icon: L.divIcon({
           zIndexOffset: 1000,
-          html: fighterSVG,
+          html: tankSVG,
           className: '',
           iconSize:   [20, 20],
           iconAnchor: [10, 10] // set icon center
