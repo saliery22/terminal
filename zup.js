@@ -840,7 +840,7 @@ function success(position) {
       <path d="M25 80 L75 80 L80 40 L50 15 L20 40 Z" 
             fill="#FFD700" 
             stroke="#000" 
-            stroke-width="7" 
+            stroke-width="6" 
             stroke-linejoin="round" />
       
       <!-- Ствол (Жирная линия направления) -->
@@ -859,8 +859,8 @@ function success(position) {
           zIndexOffset: 1000,
           html: tankSVG,
           className: '',
-          iconSize:   [20, 20],
-          iconAnchor: [10, 10] // set icon center
+          iconSize:   [24, 24],
+          iconAnchor: [12, 12] // set icon center
         })
       }).addTo(map);
   
@@ -884,7 +884,7 @@ function success(position) {
         let y=allunits[i].getPosition().y;
         let x=allunits[i].getPosition().x;
         if (!my_line){
-          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: 'rgb(0, 255, 0)',weight:1,opacity:1}).addTo(map);
+          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: '#FFD700',weight:1,opacity:1}).addTo(map);
         }else{
           my_line.setLatLngs([[y, x],[position.coords.latitude,position.coords.longitude]]);
         }
@@ -1031,14 +1031,15 @@ function updatePopupContent() {
 
     // Берем направление из нашей переменной компаса
     const directionText = getDirection(currentCompassHeading); 
-    const content = `
-    <div style="text-align: center; font size="1";">
-        <b>Обновлено:</b> ${lastUpdate}<br />
-        <b>Направление:</b> ${directionText} (${Math.round(currentCompassHeading)}°)<br />
-        <b>Точность:</b> ±${accuracy} м<br />
-        <span style="color: blue;"><b>Скорость:</b> ${speedKmH} км/ч</span>
-    </div>
-    `;
+    content = 
+                  '<div style="min-width:50px; font-family: sans-serif;">' +
+                      '<table style="width:100%; font-size:10px; border-collapse:collapse;">' +
+                          '<tr><td style="text-align:center;">🕒</td><td style="text-align:right;">' + lastUpdate + '</td></tr>' +
+                          '<tr><td style="text-align:center;">🧭</td><td style="text-align:right;">' + directionText + ' ('+Math.round(currentCompassHeading)+'°) </td></tr>' +
+                          '<tr><td style="text-align:center;">📡</td><td style="text-align:right;">' + accuracy + ' м</td></tr>' +
+                          '<tr><td style="text-align:center;">🚀</td><td style="text-align:right; font-weight:bold; color:#28a745;">' + speedKmH + ' км/ч</td></tr>' +
+                      '</table>' +
+                  '</div>';
 
     if (my_icon.getPopup()) {
         my_icon.getPopup().setContent(content);
