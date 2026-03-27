@@ -842,7 +842,7 @@ function success(position) {
   
   
   
-      my_icon = L.marker([51.62995, 33.64288], {
+      my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
         pane: 'my_navi',
         rotationAngle: 0,
         icon: L.divIcon({
