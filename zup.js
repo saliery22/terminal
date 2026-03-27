@@ -14,6 +14,7 @@ allunits.forEach(function(unit) {
      if (unitMarker) {
       if(unitMarker.wr){
         unitMarker.setOpacity(1);
+        if (unitMarker._icon)unitMarker._icon.style.pointerEvents = 'auto';
           update_marker(unitMarker, unit, unit.getPosition(),unit.getPosition().t)
           }
      }
@@ -37,6 +38,7 @@ function getUnitMarker(unit) {
   marker = L.marker([unitPos.y, unitPos.x], {
     //clickable: true,
     //draggable: true,
+    pane: 'Markers',
     opacity: 1,
     icon: L.icon({
       iconUrl: unit.getIconUrl(imsaze),
@@ -137,7 +139,7 @@ $('#grupi_avto').empty();
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
       unit.addListener('changeLastMessage', function(event) {
-
+      if(pleyerr )return;
       if (map.dragging.moving()) return;
       var pos = event.getData();
       if (pos) {
@@ -242,7 +244,7 @@ if (geozones.length === 0) {
             }
            }
            var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
-           var geozona =  L.polygon(cord, {pane: 'heavyMarkers2',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
+           var geozona =  L.polygon(cord, {pane: 'Fields',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
            geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
            geozones.push(geozona);   
       }
@@ -418,10 +420,14 @@ function initMap() {
     attributionControl: false 
   }).setView([51.62995, 33.64288], 9);
 
-  map.createPane('heavyMarkers');
-  map.getPane('heavyMarkers').style.zIndex = 600; 
+  map.createPane('Fields');
+  map.getPane('Fields').style.zIndex = 400; 
   map.createPane('heavyMarkers2');
   map.getPane('heavyMarkers2').style.zIndex = 500; 
+  map.createPane('Markers');
+  map.getPane('Markers').style.zIndex = 550;
+  map.createPane('heavyMarkers');
+  map.getPane('heavyMarkers').style.zIndex = 600; 
   map.createPane('my_navi');
   map.getPane('my_navi').style.zIndex = 700; 
   
@@ -429,12 +435,14 @@ function initMap() {
 map.on('zoomstart', function() {
     map.getPane('heavyMarkers').style.display = 'none';
     map.getPane('heavyMarkers2').style.display = 'none';
+    map.getPane('Fields').style.display = 'none';
 });
 
 // Возвращаем иконки только после того, как зум полностью завершился
 map.on('zoomend', function() {
      map.getPane('heavyMarkers').style.display = 'block';
      map.getPane('heavyMarkers2').style.display = 'block';
+     map.getPane('Fields').style.display = 'block';
 });
 
 
@@ -1015,3 +1023,234 @@ function updatePopupContent() {
         my_icon.bindPopup(content);
     }
 }
+
+
+let pleyerr = false;
+let pleyer_marker;
+$('#play_bt').click(async function() {
+    trackData=[];
+    unit_name="";
+    let unit;
+    // 1. Проверяем, если плеер уже открыт — просто закрываем его
+    if ($(this).hasClass('active')) {
+        $(this).removeClass('active');
+        $('.pleyer-div').hide();
+        $('.search-wrapper, .chips, .btn-work').fadeIn();
+        online_upd();
+        pleyerr = false;
+
+        if (typeof pleyer_marker !== 'undefined' && pleyer_marker !== null) {
+          map.removeLayer(pleyer_marker); // Удаляем с карты
+          pleyer_marker = null;           // Очищаем переменную
+        }
+
+        $('#scroll-content').empty();
+        return; // Выходим, поиск выполнять не нужно
+    }
+
+    let searchValue = $('#lis0').val().trim();
+    let found = false;
+
+    // 2. Логика поиска юнита
+    if (searchValue !== '') {
+        for (let i = 0; i < allunits.length; i++) {
+            let nm = allunits[i].getName();
+            if (nm==searchValue) {
+                let pos = allunits[i].getPosition();
+                map.setView([pos.y, pos.x]);
+                
+                $("#lis0").val(nm);
+                chus_unit_id = allunits[i].getId();
+                unit = allunits[i]
+                layers[0] = 0;            
+                found = true;
+                break;
+            }
+        }
+    }
+
+    // 3. Обработка результата
+    if (!found) {
+        // Ошибка: ничего не ввели или не нашли совпадений
+        $('#lis0').css('border', '2px solid #ea4335');
+        $('.search-wrapper').addClass('shake-error');
+
+        setTimeout(function() {
+            $('#lis0').css('border', 'none');
+            $('.search-wrapper').removeClass('shake-error');
+        }, 1000);
+        return;
+    }
+
+    // 4. Активация плеера
+    $(this).addClass('active');
+    $($('.search-wrapper, .chips, .btn-work')).hide();
+    $('.pleyer-div').fadeIn();
+
+      Object.values(markerByUnit).forEach(function(marker) {
+    if (marker) {
+        marker.setOpacity(0); // Показать все
+        marker.setZIndexOffset(-900);
+        if (marker._icon)marker._icon.style.pointerEvents = 'none';  
+    }
+});
+ isWorkFilterActive = true;
+   document.getElementById('filter_work').classList.toggle('active', isWorkFilterActive);
+ for (const key in online_mark) {  map.removeLayer(online_mark[key])}
+    
+    pleyerr = true;
+    var sess = wialon.core.Session.getInstance(); 
+    let to = sess.getServerTime(); // get current server time (end time of report time interval)
+	  let date = new Date(to * 1000); // переводим в миллисекунды для Date
+    date.setHours(0, 0, 0, 0); 
+    let from = Math.floor(date.getTime() / 1000); // получаем начало дня в секундах
+    trackData  = await  get_Data(from,to,unit);
+    fillTimeline(trackData) 
+    unit_name = searchValue;
+    pleyer_marker = L.marker([unit.getPosition().y, unit.getPosition().x], {
+    opacity: 1,
+    icon: L.icon({
+      iconUrl: unit.getIconUrl(18),
+      iconSize: [18, null],
+      iconAnchor: [18/2, 18/2] // set icon center
+    })
+  });
+  pleyer_marker.bindPopup('<center><font size="1">' + unit.getName(),{closeButton: false,autoClose: false,closeOnClick: false});
+  pleyer_marker.addTo(map);
+  pleyer_marker.openPopup();
+
+     show_track(); 
+
+});
+
+
+function fillTimeline(data) {
+    const container = $('#scroll-content');
+    container.empty(); 
+
+    data.forEach((point, index) => {
+        // Добавляем время (point[2] — это ваш формат '12:34:56') каждые 20 точек
+        let timeLabel = (index % 20 === 0) ? `<span class="time-label">${point[2]}</span>` : '';
+        let tickClass = (index % 20 === 0) ? 'time-tick major' : 'time-tick';
+
+        container.append(`
+            <div class="${tickClass}">
+                ${timeLabel}
+            </div>
+        `);
+    });
+}
+
+const timeline = document.getElementById('timeline');
+
+timeline.addEventListener('scroll', function() {
+    let scrollPos = timeline.scrollLeft;
+    
+    // 22px — это ширина одного деления (2px) + отступ (20px gap)
+    let step = 22; 
+    let index = Math.round(scrollPos / step);
+
+    // Проверяем, есть ли такая точка в данных
+    if (trackData[index]) {
+        // Сразу передаем готовую точку массива [y, x, date, fuel, s, time, ...]
+        updateUI(trackData[index]);
+    }
+    
+    $('#hint').fadeOut(); // Скрываем подсказку
+});
+
+let trackData = [];
+let unit_name = "";
+function updateUI(closest) {
+    if (!closest || !pleyer_marker ) return;
+    if (!closest[0]) return;
+
+ 
+    let newLatLng = new L.LatLng(closest[0], closest[1]);
+    pleyer_marker.setLatLng(newLatLng);
+
+    // 2. Обновляем текст в попапе
+    let popupContent  = 
+                  '<div style="min-width:50px; font-family: sans-serif;">' +
+                      '<div style="text-align:center; font-size:10px; font-weight:bold; border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;">' + 
+                          unit_name + 
+                      '</div>' +
+                      '<table style="width:100%; font-size:10px; border-collapse:collapse;">' +
+                          '<tr><td style="text-align:center;">🕒</td><td style="text-align:right;">' + closest[2] + '</td></tr>' +
+                          '<tr><td style="text-align:center;">🚀</td><td style="text-align:right; font-weight:bold;">' + closest[4] + ' км/год</td></tr>' +
+                          '<tr><td style="text-align:center;">⛽</td><td style="text-align:right; font-weight:bold; color:#28a745;">' + closest[3] + ' л</td></tr>' +
+                          '<tr><td style="text-align:center;">👤</td><td style="text-align:right;">' + (closest[7] || '—') + '</td></tr>' +
+                          '<tr><td style="text-align:center;">⚙️</td><td style="text-align:right;">' + (closest[6] || '—') + '</td></tr>' +
+                      '</table>' +
+                  '</div>';  
+    
+    pleyer_marker.setPopupContent(popupContent);
+
+    // 3. Плавно ведем камеру
+    map.panTo(newLatLng, {animate: false});
+}
+
+function get_Data(from, to, unit) {
+    return new Promise((resolve, reject) => {
+        
+        let result = [];
+        let FuelID = -1, VodiyID = -1, PrichepID = -1;
+        let sens = unit.getSensors();
+        
+        for (let key in sens) {
+            if (FuelID == -1 && sens[key].t == 'fuel level') FuelID = sens[key].id;
+            if (VodiyID == -1 && sens[key].t == 'driver') VodiyID = sens[key].id;
+            if (PrichepID == -1 && sens[key].t == 'trailer') PrichepID = sens[key].id;
+        }
+
+        let sess = wialon.core.Session.getInstance();
+        let ml = sess.getMessagesLoader();
+
+        ml.loadInterval(unit.getId(), from, to, 0, 0, 0xffffffff, (code, data) => {
+            if (code) {
+                console.error(wialon.core.Errors.getErrorText(code));
+                reject(code);
+                return;
+            }
+            
+            let messages = data.messages;
+            if (messages && messages.length > 0) {
+                for (let i = 0; i < messages.length; i++) {
+                    let m = messages[i];
+                    let y = m.pos ? m.pos.y : null;
+                    let x = m.pos ? m.pos.x : null;
+                    let s = m.pos ? m.pos.s : null;
+                    let date = wialon.util.DateTime.formatTime(m.t);
+                    
+                    let fuel = (FuelID != -1) ? unit.calculateSensorValue(unit.getSensor(FuelID), m) : null;
+                    if (fuel == -348201.3876) fuel = null; else if (fuel !== null) fuel = fuel.toFixed();
+
+                    let vodiy = null;                   
+                    if (VodiyID!=-1) {
+                   vodiy = unit.calculateSensorValue(unit.getSensor(VodiyID));
+                   if(vodiy == -348201.3876){vodiy = null;}else{
+                    if(vodiy){
+                      if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
+                    }
+                   }
+                  }
+                  let prichep = null;
+                   if (PrichepID!=-1) {
+                   prichep = unit.calculateSensorValue(unit.getSensor(PrichepID));
+                   if(prichep == -348201.3876){prichep = null;} else {
+                     if(prichep){
+                      if(trailersID[prichep]){prichep = trailersID[prichep];}else{prichep = "картка-"+prichep;}
+                    }
+                   }
+                  }
+
+                    result.push([y, x, date, fuel, s, m.t, prichep, vodiy]);
+                }
+                resolve(result); // ВОЗВРАЩАЕМ ДАННЫЕ
+            } else {
+                resolve([]); // Сообщений нет
+            }
+        });
+    });
+}
+
