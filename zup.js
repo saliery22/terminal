@@ -1045,7 +1045,7 @@ function updatePopupContent() {
         my_icon.getPopup().setContent(content);
     } else {
         // Если попапа нет — создаем и привязываем его
-        my_icon.bindPopup(content);
+        my_icon.bindPopup(content,{closeButton: false});
     }
 }
 
