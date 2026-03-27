@@ -831,14 +831,24 @@ function success(position) {
 
 
   if (!my_icon){
-    const fighterSVG = `
+    const tankSVG = `
     <svg viewBox="0 0 100 100" xmlns="http://w3.org">
-    <path d="M50 5 L40 30 L5 75 L45 65 L45 80 L25 95 L50 88 L75 95 L55 80 L55 65 L95 75 L60 30 Z" 
-          fill="#FFD700" 
-          stroke="#000000" 
-          stroke-width="4" 
-          stroke-linejoin="round" />
-  </svg>`;
+      <!-- Подложка для контраста на любых картах -->
+      <path d="M20 85 L80 85 L85 40 L50 10 L15 40 Z" fill="white" opacity="0.5" />
+      
+      <!-- Корпус-указатель (Форма пятиугольника как стрелка) -->
+      <path d="M25 80 L75 80 L80 40 L50 15 L20 40 Z" 
+            fill="#FFD700" 
+            stroke="#000" 
+            stroke-width="7" 
+            stroke-linejoin="round" />
+      
+      <!-- Ствол (Жирная линия направления) -->
+      <rect x="44" y="0" width="12" height="65" rx="2" fill="#000" />
+      
+      <!-- Упрощенная башня (Центральная точка) -->
+      <circle cx="50" cy="55" r="14" fill="#000" />
+    </svg>`;
   
   
   
