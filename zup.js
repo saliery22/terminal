@@ -139,7 +139,7 @@ $('#grupi_avto').empty();
     var unitMarker = getUnitMarker(unit);
      if (unitMarker) {
       unit.addListener('changeLastMessage', function(event) {
-      if(pleyerr )return;
+      if(pleyerr)return;
       if (map.dragging.moving()) return;
       var pos = event.getData();
       if (pos) {
@@ -797,6 +797,7 @@ function serch_unit() {
 });
 
 $('#me').click(function() { 
+
   if (my_icon){
      map.closePopup();
      map.setView(my_icon.getLatLng());
@@ -830,16 +831,29 @@ function success(position) {
 
 
   if (!my_icon){
-    my_icon = L.marker([position.coords.latitude, position.coords.longitude], {
-      pane: 'my_navi',
-      rotationAngle: 0,
-      icon: L.icon({
-        zIndexOffset: 1000,
-        iconUrl: '111.png',
-        iconSize:   [20, 20],
-        iconAnchor: [10, 10] // set icon center
-      })
-    }).addTo(map);
+    const fighterSVG = `
+    <svg viewBox="0 0 100 100" xmlns="http://w3.org">
+    <path d="M50 5 L40 30 L5 75 L45 65 L45 80 L25 95 L50 88 L75 95 L55 80 L55 65 L95 75 L60 30 Z" 
+          fill="#FFD700" 
+          stroke="#000000" 
+          stroke-width="4" 
+          stroke-linejoin="round" />
+  </svg>`;
+  
+  
+  
+      my_icon = L.marker([51.62995, 33.64288], {
+        pane: 'my_navi',
+        rotationAngle: 0,
+        icon: L.divIcon({
+          zIndexOffset: 1000,
+          html: fighterSVG,
+          className: '',
+          iconSize:   [20, 20],
+          iconAnchor: [10, 10] // set icon center
+        })
+      }).addTo(map);
+  
     updatePopupContent();
 
     y_pr=position.coords.latitude;
@@ -1144,7 +1158,8 @@ function fillTimeline(data) {
                 ${timeLabel}
             </div>
         `);
-    });
+    }); 
+    timeline.scrollLeft = timeline.scrollWidth;
 }
 
 const timeline = document.getElementById('timeline');
@@ -1202,7 +1217,7 @@ function get_Data(from, to, unit) {
         let result = [];
         let FuelID = -1, VodiyID = -1, PrichepID = -1;
         let sens = unit.getSensors();
-        
+   
         for (let key in sens) {
             if (FuelID == -1 && sens[key].t == 'fuel level') FuelID = sens[key].id;
             if (VodiyID == -1 && sens[key].t == 'driver') VodiyID = sens[key].id;
@@ -1233,7 +1248,7 @@ function get_Data(from, to, unit) {
 
                     let vodiy = null;                   
                     if (VodiyID!=-1) {
-                   vodiy = unit.calculateSensorValue(unit.getSensor(VodiyID));
+                   vodiy = unit.calculateSensorValue(unit.getSensor(VodiyID), m);
                    if(vodiy == -348201.3876){vodiy = null;}else{
                     if(vodiy){
                       if(driversID[vodiy]){vodiy = driversID[vodiy];}else{vodiy = "картка-"+vodiy;}
@@ -1242,7 +1257,7 @@ function get_Data(from, to, unit) {
                   }
                   let prichep = null;
                    if (PrichepID!=-1) {
-                   prichep = unit.calculateSensorValue(unit.getSensor(PrichepID));
+                   prichep = unit.calculateSensorValue(unit.getSensor(PrichepID), m);
                    if(prichep == -348201.3876){prichep = null;} else {
                      if(prichep){
                       if(trailersID[prichep]){prichep = trailersID[prichep];}else{prichep = "картка-"+prichep;}
