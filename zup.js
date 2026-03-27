@@ -1115,7 +1115,13 @@ $('#play_bt').click(async function() {
       iconAnchor: [18/2, 18/2] // set icon center
     })
   });
-  pleyer_marker.bindPopup('<center><font size="1">' + unit.getName(),{closeButton: false,autoClose: false,closeOnClick: false});
+  pleyer_marker.bindPopup('<center><font size="1">' + unit.getName(),{
+    closeButton: false,
+    autoClose: false,
+    closeOnClick: false,
+    autoPan: false,
+    keepInView: false
+});
   pleyer_marker.addTo(map);
   pleyer_marker.openPopup();
 
@@ -1187,7 +1193,7 @@ function updateUI(closest) {
     pleyer_marker.setPopupContent(popupContent);
 
     // 3. Плавно ведем камеру
-    map.panTo(newLatLng, {animate: false});
+    map.panTo(newLatLng, {animate: true});
 }
 
 function get_Data(from, to, unit) {
