@@ -245,7 +245,7 @@ if (geozones.length === 0) {
            }
            var color = "#" + wialon.util.String.sprintf("%08x", zone.c).substr(2);
            var geozona =  L.polygon(cord, {pane: 'Fields',color: '#FF00FF', stroke: true,weight: 1, opacity: 0.5, fillOpacity: 0.4, fillColor: color});
-           geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true});
+           geozona.bindPopup(zone.n +'<br />' +zonegr,{opacity:0.8,sticky:true,closeButton: false});
            geozones.push(geozona);   
       }
       let lgeozone = L.layerGroup(geozones);
@@ -425,11 +425,11 @@ function initMap() {
   map.createPane('heavyMarkers2');
   map.getPane('heavyMarkers2').style.zIndex = 500; 
   map.createPane('Markers');
-  map.getPane('Markers').style.zIndex = 550;
+  map.getPane('Markers').style.zIndex = 530;
   map.createPane('heavyMarkers');
-  map.getPane('heavyMarkers').style.zIndex = 600; 
+  map.getPane('heavyMarkers').style.zIndex = 550; 
   map.createPane('my_navi');
-  map.getPane('my_navi').style.zIndex = 700; 
+  map.getPane('my_navi').style.zIndex = 590; 
   
  // Скрываем маркеры, когда начался зум пальцами
 map.on('zoomstart', function() {
@@ -470,7 +470,7 @@ var basemaps = {
 
 layerControl=L.control.layers(basemaps).addTo(map);
 
-basemaps['OSM'].addTo(map);
+basemaps['Google Streets'].addTo(map);
 
 
 L.control.zoom({
@@ -736,7 +736,7 @@ function serch_unit() {
    if(nm.indexOf(res)>=0){
     let y=allunits[i].getPosition().y;
     let x=allunits[i].getPosition().x;
-    map.setView([y,x]);
+    map.setView([y,x], map.getZoom(), { animate: false });
     $("#lis0").val(nm);
     chus_unit_id = id;
     markerByUnit[id].openPopup();
@@ -797,13 +797,13 @@ function serch_unit() {
 });
 
 $('#me').click(function() { 
-
-  if (my_icon){
-     map.closePopup();
-     map.setView(my_icon.getLatLng());
-     my_icon.setZIndexOffset(10000);
-     my_icon.openPopup();
-    }
+if (my_icon) {
+    map.closePopup();
+    // animate: false заставляет карту прыгнуть мгновенно
+    map.setView(my_icon.getLatLng(), map.getZoom(), { animate: false }); 
+    my_icon.setZIndexOffset(10000);
+    my_icon.openPopup();
+}
 });
 
 let my_icon=null;
@@ -832,23 +832,15 @@ function success(position) {
 
   if (!my_icon){
     const tankSVG = `
-    <svg viewBox="0 0 100 100" xmlns="http://w3.org">
-      <!-- Подложка для контраста на любых картах -->
-      <path d="M20 85 L80 85 L85 40 L50 10 L15 40 Z" fill="white" opacity="0.5" />
-      
-      <!-- Корпус-указатель (Форма пятиугольника как стрелка) -->
-      <path d="M25 80 L75 80 L80 40 L50 15 L20 40 Z" 
-            fill="#FFD700" 
-            stroke="#000" 
-            stroke-width="6" 
-            stroke-linejoin="round" />
-      
-      <!-- Ствол (Жирная линия направления) -->
-      <rect x="44" y="0" width="12" height="65" rx="2" fill="#000" />
-      
-      <!-- Упрощенная башня (Центральная точка) -->
-      <circle cx="50" cy="55" r="14" fill="#000" />
-    </svg>`;
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org">
+        <!-- Тень/Контур для контраста -->
+        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" 
+              stroke="black" stroke-width="2" stroke-linejoin="round"/>
+        <!-- Основной цвет (Синий навигационный) -->
+        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" 
+              fill="#00d5ff"/>
+    </svg>
+    `;
   
   
   
@@ -858,9 +850,9 @@ function success(position) {
         icon: L.divIcon({
           zIndexOffset: 1000,
           html: tankSVG,
-          className: '',
-          iconSize:   [24, 24],
-          iconAnchor: [12, 12] // set icon center
+          className: 'no-transition',
+          iconSize:   [18, 18],
+          iconAnchor: [9, 9] // set icon center
         })
       }).addTo(map);
   
@@ -1082,8 +1074,7 @@ $('#play_bt').click(async function() {
             let nm = allunits[i].getName();
             if (nm==searchValue) {
                 let pos = allunits[i].getPosition();
-                map.setView([pos.y, pos.x]);
-                
+                map.setView([pos.y, pos.x], map.getZoom(), { animate: false });
                 $("#lis0").val(nm);
                 chus_unit_id = allunits[i].getId();
                 unit = allunits[i]
