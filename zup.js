@@ -807,7 +807,6 @@ if (my_icon) {
 });
 
 let my_icon=null;
-let my_line=null;
 let y_pr=0;
 let x_pr=0;
 let y_pr2=0;
@@ -868,22 +867,7 @@ function success(position) {
      
       my_icon.setLatLng([position.coords.latitude, position.coords.longitude]);
       my_icon.setZIndexOffset(1000);
-      let res = $("#lis0").val();
-      for (let i = 0; i<allunits.length; i++){
-        if(res=='')break;
-        let nm=allunits[i].getName();
-       if(nm.indexOf(res)>=0){
-        let y=allunits[i].getPosition().y;
-        let x=allunits[i].getPosition().x;
-        if (!my_line){
-          my_line =  L.polyline([[y, x],[position.coords.latitude,position.coords.longitude]], {color: '#FFD700',weight:1,opacity:1}).addTo(map);
-        }else{
-          my_line.setLatLngs([[y, x],[position.coords.latitude,position.coords.longitude]]);
-        }
-
-          break;
-       }
-       }
+  
 
     if(position.coords.accuracy<30){
     if(position.coords.latitude!=y_pr  || position.coords.longitude!=x_pr){
