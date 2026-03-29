@@ -1036,7 +1036,7 @@ $('#play_bt').click(async function() {
     if ($(this).hasClass('active')) {
         $(this).removeClass('active');
         $('.pleyer-div').hide();
-        $('.search-wrapper, .chips, .btn-work').fadeIn();
+        $('.search-wrapper, .chips, .btn-work, .btn-loc, .clear-work').fadeIn();
         online_upd();
         pleyerr = false;
 
@@ -1084,7 +1084,7 @@ $('#play_bt').click(async function() {
 
     // 4. Активация плеера
     $(this).addClass('active');
-    $($('.search-wrapper, .chips, .btn-work')).hide();
+    $($('.search-wrapper, .chips, .btn-work, .btn-loc, .clear-work')).hide();
     $('.pleyer-div').fadeIn();
 
       Object.values(markerByUnit).forEach(function(marker) {
