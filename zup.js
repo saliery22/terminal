@@ -8,6 +8,11 @@ var map =null, marker,allunits = [], markerByUnit = {},tile_layer, layers = {};
 let RES_ID=601000448;// 601000284   "11_ККЗ"  601000448  "KKZ_Gluhiv"
 
 
+
+
+
+
+
 function online_upd() {
 allunits.forEach(function(unit) {          
     var unitMarker =  markerByUnit[unit.getId()];
@@ -79,6 +84,13 @@ function getUnitMarker(unit) {
 
 
 
+const url_params = new URLSearchParams(window.location.search);
+ let pr_name = url_params.get('name'); 
+ let pr_fr = url_params.get('fr'); 
+ let pr_to = url_params.get('to'); 
+ if(pr_fr)pr_fr=Number(pr_fr)
+ if(pr_to)pr_to=Number(pr_to)
+
 function init() { // Execute after login succeed
   // get instance of current Session
   var session = wialon.core.Session.getInstance();
@@ -106,6 +118,10 @@ function init() { // Execute after login succeed
       if (error) {
       } else {
         initUIData();
+        if(pr_name){
+          $("#lis0").val(pr_name);
+          $('#play_bt').click(); 
+        }
       }
     }
   );
@@ -571,8 +587,8 @@ function show_track (time1,time2) {
       date.setHours(0, 0, 0, 0); 
       from = Math.floor(date.getTime() / 1000); // получаем начало дня в секундах
     }else{
-    to = Date.parse(time2)/1000;
-    from = Date.parse(time1)/1000;
+    to = time2;
+    from = time1;
     }
 		if (!unit) return; // exit if no unit
           	if (layers[0]==0)
@@ -1104,6 +1120,8 @@ $('#play_bt').click(async function() {
 	  let date = new Date(to * 1000); // переводим в миллисекунды для Date
     date.setHours(0, 0, 0, 0); 
     let from = Math.floor(date.getTime() / 1000); // получаем начало дня в секундах
+    if (pr_fr)from=pr_fr;
+    if (pr_to)to=pr_to;
     trackData  = await  get_Data(from,to,unit);
     fillTimeline(trackData) 
     unit_name = searchValue;
@@ -1125,7 +1143,7 @@ $('#play_bt').click(async function() {
   pleyer_marker.addTo(map);
   pleyer_marker.openPopup();
 
-     show_track(); 
+     show_track(pr_fr,pr_to); 
 
 });
 
@@ -1140,13 +1158,48 @@ function fillTimeline(data) {
         let tickClass = (index % 20 === 0) ? 'time-tick major' : 'time-tick';
 
         container.append(`
-            <div class="${tickClass}">
-                ${timeLabel}
-            </div>
-        `);
+        <div class="${tickClass}" data-index="${index}" data-time="${point[5]}"> 
+            ${timeLabel}
+        </div>
+    `);
     }); 
-    timeline.scrollLeft = timeline.scrollWidth;
+    if (pr_fr){
+      scrollToTime(pr_fr+18000)
+    }else{
+      timeline.scrollLeft = timeline.scrollWidth;
+    }
 }
+
+function scrollToTime(targetTimestamp) {
+  const container = $('#scroll-content');
+  const ticks = container.find('.time-tick');
+  
+  // Находим ближайшую точку к нашему целевому времени
+  let closestIndex = 0;
+  let minDiff = Infinity;
+
+  data.forEach((point, index) => {
+      let diff = Math.abs(point[3] - targetTimestamp); // Сравниваем timestamp
+      if (diff < minDiff) {
+          minDiff = diff;
+          closestIndex = index;
+      }
+  });
+
+  // Находим элемент на странице
+  const targetElement = ticks.eq(closestIndex);
+  
+  if (targetElement.length) {
+      const timeline = document.getElementById('timeline'); // Ваш оберточный блок со скроллом
+      const scrollPos = targetElement.position().left + timeline.scrollLeft - (timeline.offsetWidth / 2);
+      
+      timeline.scrollTo({
+          left: scrollPos,
+          behavior: 'smooth' // Плавная прокрутка
+      });
+  }
+}
+
 
 const timeline = document.getElementById('timeline');
 
