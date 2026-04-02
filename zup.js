@@ -1164,41 +1164,40 @@ function fillTimeline(data) {
     `);
     }); 
     if (pr_fr){
-      scrollToTime(pr_fr+18000)
+      const targetTimestamp = pr_fr+18000
+      const container = $('#scroll-content');
+      const ticks = container.find('.time-tick');
+      
+      // Находим ближайшую точку к нашему целевому времени
+      let closestIndex = 0;
+      let minDiff = Infinity;
+    
+      data.forEach((point, index) => {
+          let diff = Math.abs(point[3] - targetTimestamp); // Сравниваем timestamp
+          if (diff < minDiff) {
+              minDiff = diff;
+              closestIndex = index;
+          }
+      });
+    
+      // Находим элемент на странице
+      const targetElement = ticks.eq(closestIndex);
+      
+      if (targetElement.length) {
+          const timeline = document.getElementById('timeline'); // Ваш оберточный блок со скроллом
+          const scrollPos = targetElement.position().left + timeline.scrollLeft - (timeline.offsetWidth / 2);
+          
+          timeline.scrollTo({
+              left: scrollPos,
+              behavior: 'smooth' // Плавная прокрутка
+          });
+      }
     }else{
       timeline.scrollLeft = timeline.scrollWidth;
     }
 }
 
-function scrollToTime(targetTimestamp) {
-  const container = $('#scroll-content');
-  const ticks = container.find('.time-tick');
-  
-  // Находим ближайшую точку к нашему целевому времени
-  let closestIndex = 0;
-  let minDiff = Infinity;
 
-  data.forEach((point, index) => {
-      let diff = Math.abs(point[3] - targetTimestamp); // Сравниваем timestamp
-      if (diff < minDiff) {
-          minDiff = diff;
-          closestIndex = index;
-      }
-  });
-
-  // Находим элемент на странице
-  const targetElement = ticks.eq(closestIndex);
-  
-  if (targetElement.length) {
-      const timeline = document.getElementById('timeline'); // Ваш оберточный блок со скроллом
-      const scrollPos = targetElement.position().left + timeline.scrollLeft - (timeline.offsetWidth / 2);
-      
-      timeline.scrollTo({
-          left: scrollPos,
-          behavior: 'smooth' // Плавная прокрутка
-      });
-  }
-}
 
 
 const timeline = document.getElementById('timeline');
