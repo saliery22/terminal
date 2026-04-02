@@ -1149,51 +1149,48 @@ $('#play_bt').click(async function() {
 
 
 function fillTimeline(data) {
-    const container = $('#scroll-content');
-    container.empty(); 
+  const container = $('#scroll-content');
+  const timeline = document.getElementById('timeline'); // Объявляем сразу для обоих условий
+  if (!timeline) return;
 
-    data.forEach((point, index) => {
-        // Добавляем время (point[2] — это ваш формат '12:34:56') каждые 20 точек
-        let timeLabel = (index % 20 === 0) ? `<span class="time-label">${point[2]}</span>` : '';
-        let tickClass = (index % 20 === 0) ? 'time-tick major' : 'time-tick';
+  container.empty(); 
 
-        container.append(`
-        <div class="${tickClass}" data-index="${index}" data-time="${point[5]}"> 
-            ${timeLabel}
-        </div>
-    `);
-    }); 
-    if (pr_fr){
-      const targetTimestamp = pr_fr+18000
-      const ticks = container.find('.time-tick');
-      
-      // Находим ближайшую точку к нашему целевому времени
-      let closestIndex = 0;
-      let minDiff = Infinity;
-    
-      data.forEach((point, index) => {
-          let diff = Math.abs(point[3] - targetTimestamp); // Сравниваем timestamp
+  // 1. Собираем всё в одну строку, чтобы обновить DOM один раз (в 10-20 раз быстрее)
+  let html = '';
+  let closestIndex = 0;
+  let minDiff = Infinity;
+  const targetTimestamp = pr_fr ? pr_fr + 18000 : null;
+
+  data.forEach((point, index) => {
+      const isMajor = index % 20 === 0;
+      const timeLabel = isMajor ? `<span class="time-label">${point[2]}</span>` : '';
+      const tickClass = isMajor ? 'time-tick major' : 'time-tick';
+
+      html += `<div class="${tickClass}" data-index="${index}" data-time="${point[5]}">${timeLabel}</div>`;
+
+      // Ищем индекс для скролла сразу в этом же цикле
+      if (targetTimestamp) {
+          let diff = Math.abs(point[5] - targetTimestamp);
           if (diff < minDiff) {
               minDiff = diff;
               closestIndex = index;
           }
-      });
-    
-      // Находим элемент на странице
-      const targetElement = ticks.eq(closestIndex);
-      
-      if (targetElement.length) {
-          const timeline = document.getElementById('timeline'); // Ваш оберточный блок со скроллом
-          const scrollPos = targetElement.position().left + timeline.scrollLeft - (timeline.offsetWidth / 2);
-          
-          timeline.scrollTo({
-              left: scrollPos,
-              behavior: 'smooth' // Плавная прокрутка
-          });
       }
-    }else{
+  });
+
+  container.append(html);
+
+  // 2. Логика скролла
+  if (pr_fr) {
+      const targetElement = container.find('.time-tick').eq(closestIndex);
+      if (targetElement.length) {
+          const scrollPos = targetElement.position().left + timeline.scrollLeft - (timeline.offsetWidth / 2);
+          timeline.scrollTo({ left: scrollPos, behavior: 'auto' });
+      }
+  } else {
+      // Скролл в самый конец, если нет pr_fr
       timeline.scrollLeft = timeline.scrollWidth;
-    }
+  }
 }
 
 
