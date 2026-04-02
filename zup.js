@@ -1165,7 +1165,6 @@ function fillTimeline(data) {
     }); 
     if (pr_fr){
       const targetTimestamp = pr_fr+18000
-      const container = $('#scroll-content');
       const ticks = container.find('.time-tick');
       
       // Находим ближайшую точку к нашему целевому времени
