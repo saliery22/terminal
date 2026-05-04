@@ -35,7 +35,7 @@ function getUnitMarker(unit) {
   if (marker) return marker;
     
   var unitPos = unit.getPosition();
-  var imsaze = 22;
+  var imsaze = 20;
   if (!unitPos) return null;
     
 
@@ -347,7 +347,10 @@ function update_marker(marker, unit, data ,time) {
             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "move.png",iconSize:[40,40],iconAnchor:[15, 20]})}).addTo(map);
             markerstarton.setRotationAngle(parseInt(data.c)-90);
             online_mark[id] = markerstarton;
-             const el = marker.getElement();
+            }else{
+             let markerstarton = L.marker([data.y, data.x],{interactive: false, pane: 'heavyMarkers2', icon: L.icon({iconUrl: "stop_onl.png",iconSize:[10,10],iconAnchor:[-8, 5]})}).addTo(map);
+            markerstarton.setRotationAngle(parseInt(data.c)-90);
+            online_mark[id] = markerstarton;
             }
             }
     marker.setLatLng([data.y, data.x]);
